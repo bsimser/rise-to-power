@@ -1,0 +1,59 @@
+tl;dr: Would any designers want to help make the game at http://code.google.com/p/rise-to-power/ more awesome?
+
+I've been working on Rise to Power!, a strategy MMOG initially designed by my friend Noah and I back in 2006 (and interestingly, as a relatively _easy_ game to develop as compared to our previous attempt. Ha Ha!) and (after several false starts spanning years) recently coded into an open-source web-technology-based prototype. It's built around a single idea involving political intrigue, which I like to think is pretty novel, but the gist of the game is that it was our attempt to bring Civilization into the realm of the MMO.
+
+The game has three (implicit) phases of play:
+1) expanding your economy in order to...
+2) conquer your enemies in order to...
+3) rise to power above the other players.
+
+The first part of the game is much like Rise of Nations (also Age of Empires, SimCity), in that, you begin with a starting set of resources, a single building, and your goal is to build more buildings and units so that you can process the raw resources in your territory into useful armies/complex resources/more population.
+
+The second part of the game is also straightforwardly explained (and much like other strategy games), where the player would use his armies/resources in order to conquer his neighboring players.
+
+However, the third part of the game is the novel part, and as a result, the most complex to explain. The idea arose because we realized that the unbounded power that a game like Civilization provides to the player is an anathema to a persistent world that an MMO must provide by definition (for how could a new player hope to compete with a long-playing enemy with essentially unlimited resources as his disposal?). We decided in Rise to Power! to bound a player's power growth by limiting the amount of territory that he could control and by creating a explicit power hierarchy within the game. 
+
+Instead of Civilization's method of territorial control, we instead divide up a 2d world of terrain tiles into a regular grid of 'municipalities', each containing NxN tiles. A municipality is the atomic unit of territorial control in Rise to Power, and a player's territory must consist of adjacent municipalities. A player designates his first municipality (the one he starts with) as his 'capital city' and as he conquers other player's territory, so do those municipalities become under his direct control.
+
+In order to bound the power growth of this player, we say that he is only allowed to control (say) 6 municipalities. At the time when he conqueres his 6th municipality, he is promoted from being the 'Mayor' of his capital city to begin the 'Count' of his new 'county'. He chooses the new capital city of his territory, which now consists of the 6 municipalities, but he *gives up direct control* of the 5 non-capital municipalities, and at that time other players (perhaps even the ones recently conquered) are allowed to rule there, but only as Mayors under our new Count.
+
+Being a Count allows a player to build more complex and strong military units as well as process certain resources more efficiently. A wise Count would do well do ensure the safety of his 5 subjects, as losing over half of his territory deposes him and he loses his new title. He might decide to demand a small compensation for the burden of this defense against oursiders in the form of a tax, and his Mayors would do well to pay.
+
+Being the subject of a lord might not seem ideal, but there are certain advantages, such as protection against other players or simpler trade, that would benefit our 5 Mayors. A new player might find that such a situation is far preferable to beginning anew in some fringe backwater. Of course, subservience is not for everyone and the 5 Mayors might collude in order to depose the Count themselves. It can get very political here.
+
+Anyway, our Count may be politically savvy enough to maintain control over his Mayors and, together, they may conquer other counties. The Count can even choose to appoint some of his Mayors to leadership over the newly conquered lands (keeping in mind the requirements about contiguity). Soon, our Count may be promoted to a Baron of his barony, by conquering (say) 4 other Counts.
+
+Noah and I believe that this idea is interesting and novel, and worth pursuing to see if it would work as well in practice as we hope it could. Unfortunately, there are still many, many design issues remaining, and Noah has become unavailable to continue the design work (as he's directly focused on finding enough money to live), and I, the programmer, don't really have the design skills necessary the finish this.
+
+The original "design document", which is a term I use loosely here, is at http://rise-to-power.googlecode.com/hg/doc/rise-to-power.pdf. There are many wrong ideas in this, and many rough paths which have been smoothed over in the source code, but whose ideas have not made it back into the documentation. The website http://rise-to-power.com/ used to point to a working prototype, but was recently turned off as my hosting provider raised their prices (I'll be trying to remedy this in the near future).
+
+If anyone would be interested in commenting about the ideas that I laid out above, or in showing me that this idea isn't really novel or doesn't actually work (given some set of reasonable mechanics), then I'd really like to hear from you. Thanks for reading all of this, and I hope to hear from some of you.
+
+
+
+
+Answers:
+
+[quote="hamstermk4"]Would the interface for Mayor be different than the interface for Count?
+
+Are you planning AI or is this all player controlled?
+
+How are you planning on ensuring there are enough players to start this community?
+
+What will you do with a player's territory when they stop playing for a long period of time?
+
+What happens when a player looses his last territory?
+
+What will be the interaction between a Count and his subject mayors?[/quote]
+
+h1) No, the interfaces and user interactions are the same, but the available building options increase as the player moves up the power hierarchy.
+
+h2) All of this is player controlled with no AI. Actually, some of the annoying manual parts of the resource economy are AI controlled, like SimCity's trip generation, but the other municipalities are all owned by players.
+
+h3) I'm not sure. I was imagining an open beta, but as much as I'm not a designer, I'm again as much not a marketer, so I'm fairly flummoxed here.
+
+h4) An undefended territory is ripe for pillaging by a neighbor. His lord might decide to reclaim that land in his name and dole it out to a more helpful servant. Actually, this brings up the another point about player power which is that this is a turn-based game, with a turn automatically happening N times per day. Choosing N is a balancing act between allowing overachievers to micromanage every aspect of their domain while at the same time allowing semi-casual players to still enjoy themselves. The game would need to support queueing of actions in order to support both of these play-styles, I think.
+
+h5) He is eliminated from the game. At that point, he can always be appointed to some other title by a friend. Or, he can choose to join a queue that exists for any municipality. If the municipality is unoccupied, it immediately becomes his capital city. If the municipality is occupied, he can choose to wait for it to become unoccupied, and then being there.
+
+h6) The goal here is to allow a full range of political-style machinations between a lord and his subjects. As a result, there is little in-game support for, say, taxing or responding to such requests. The lord will be able to see the usernames and titles of everyone in his territory, and be able to chat directly with his subordinates. A subject knows his lord, and his lord's lord, etc, up to the top, and can directly chat with his immediate superior.
