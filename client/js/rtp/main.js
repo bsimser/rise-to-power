@@ -14,5 +14,6 @@
 
 define(function(require) {
   var $ = require('jquery');
+  var ui = require('rtp/ui');
   console.log('Main is loaded. $ is', $ ? 'defined' : 'undefined');
 });
