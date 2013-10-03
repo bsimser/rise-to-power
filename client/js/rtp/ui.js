@@ -4,7 +4,8 @@ define(function(require) {
   require('rtp/controllers/map-page');
   require('rtp/controllers/login-page');
   
-  rtp.config(function($routeProvider) {
+  rtp.config(function($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
     $routeProvider.when('/login', {
       templateUrl: 'login.html',
       controller: 'LoginPageController'
