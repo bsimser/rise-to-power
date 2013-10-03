@@ -1,6 +1,8 @@
 define(function(require) {
   var $ = require('jquery');
   var rtp = require('rtp/ui-module');
+  require('rtp/controllers/map-page');
+  require('rtp/controllers/login-page');
   
   rtp.config(function($routeProvider) {
     $routeProvider.when('/login', {
