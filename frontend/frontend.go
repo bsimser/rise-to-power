@@ -15,17 +15,17 @@
 package main
 
 import (
-  "flag"
-  "log"
-  "net/http"
+	"flag"
+	"log"
+	"net/http"
 
-  "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 var (
-  addr      = flag.String("address", ":8080", "Address to bind to.")
-  staticDir = flag.String("static_dir", "client", "Root directory for static files.")
-  muxer     = mux.NewRouter()
+	addr      = flag.String("address", ":8080", "Address to bind to.")
+	staticDir = flag.String("static_dir", "client", "Root directory for static files.")
+	muxer     = mux.NewRouter()
 )
 
 type DefaultIndex struct {
@@ -42,14 +42,17 @@ func (d DefaultIndex) Open(name string) (http.File, error) {
 }
 
 func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
-  log.Fatalf("%v requested we quit.", r.RemoteAddr)
+	log.Fatalf("%v requested we quit.", r.RemoteAddr)
 }
 
 func main() {
-  flag.Parse()
-  muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
-  muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
-  http.Handle("/", muxer)
-  log.Printf("Server now listening on %v", *addr)
-  log.Fatal(http.ListenAndServe(*addr, nil))
+	flag.Parse()
+	muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
+	muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
+	// Note to test this for now:
+	// curl -v --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
+	http.Handle("/", muxer)
+	http.HandleFunc("/_api/login", AuthHandler)
+	log.Printf("Server now listening on %v", *addr)
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
