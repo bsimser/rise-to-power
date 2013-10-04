@@ -1,5 +1,6 @@
 {
   "project_id" : "Rise to Power",
-  "conduit_uri" : "http://d.sil.as/"
+  "conduit_uri" : "http://d.sil.as/",
+	"arc.land.onto.default": "default"
 }
 
