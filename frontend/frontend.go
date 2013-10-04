@@ -28,6 +28,19 @@ var (
   muxer     = mux.NewRouter()
 )
 
+type DefaultIndex struct {
+  dir http.Dir
+}
+
+func (d DefaultIndex) Open(name string) (http.File, error) {
+  log.Printf("Request: %v", name)
+  f, err := d.dir.Open(name)
+  if err != nil {
+    f, err = d.dir.Open("/index.html")
+  }
+  return f, err
+}
+
 func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
   log.Fatalf("%v requested we quit.", r.RemoteAddr)
 }
@@ -35,7 +48,7 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
   flag.Parse()
   muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
-  muxer.Handle("/", http.FileServer(http.Dir(*staticDir)))
+  muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
   http.Handle("/", muxer)
   log.Printf("Server now listening on %v", *addr)
   log.Fatal(http.ListenAndServe(*addr, nil))
