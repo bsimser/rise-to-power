@@ -1,4 +1,9 @@
-<div>
-	This is a form that lets people log in.<br>
-	<button ng-click="returnToMap()">Back to Map</button>
-</div>
+<form name="loginForm" class="login-form" ng-submit="login()">
+	<h3>Enter your credentials</h3>
+	<div class="error" ng-show="error">There was an error logging in: {{error}}</div>
+	<label>Username<br/>
+	<input type="text" name="username" ng-model="params.username" required></label>
+	<label>Password<br/>
+	<input type="password" name="password" ng-model="params.password" required></label>
+	<input type="submit" value="Login">
+</form>

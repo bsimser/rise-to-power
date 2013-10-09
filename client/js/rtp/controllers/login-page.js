@@ -14,10 +14,14 @@
 
 define(function(require) {
   var rtp = require('rtp/ui-module');
-  rtp.controller('LoginPageController', function($scope, $location) {
+  rtp.controller('LoginPageController', function($scope, $location, $http) {
     console.log('LoginPageController inited');
-    $scope.returnToMap = function() {
-      $location.path('/map');
+    $scope.login = function() {
+      $http.post('/_api/login', $scope.params).then(function() {
+        $location.path('/map');
+      }, function(error) {
+        $scope.error = error.data || error.status || error;
+      });
     };
   });
 });

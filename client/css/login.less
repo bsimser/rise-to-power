@@ -12,7 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-body {
-	@import "login.less";
-	font: 13px "Lucida Grande", Helvetica, Arial, sans-serif;
+.login-form {
+	@bgColor: #ddd;
+
+	margin: 100px auto;
+	background-color: #aaa;
+	border-radius: 10px;
+	padding: 10px;
+	width: 300px;
+	
+	h3 {
+		margin: 0px;
+		color: #555;
+	}
+	
+	label {
+		display: block;
+		margin: 5px 3px;
+		
+		input {
+			background-color: @bgColor;
+			border-radius: 3px;
+			padding: 3px;
+			border: 1px solid gray;
+		}
+		input.ng-invalid {
+			border-color: red;
+		}
+	}
+	
+	input[type='submit'] {
+		background-color: @bgColor;
+		border-radius: 3px;
+		padding: 3px;
+		border: 0px;		
+	}
+	input[type='submit']:active {
+		background-color: #888;
+	}
+	
+	.error {
+		color: red;
+	}
 }
