@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-define(function() {
+define(function(require) {
+  var angular = require('angular');
+  require('angular-route');
   return angular.module('rtp', ['ngRoute']);
 });

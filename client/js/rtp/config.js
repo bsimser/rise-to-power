@@ -17,7 +17,22 @@ require.config({
   paths: {
     jquery: 'jquery-2.0.3',
     less: 'less-1.4.1.min'
-  }
+  },
+  shim: {
+    'angular': {
+      exports: 'angular',
+      deps: ['jquery'],
+    },
+    'angular-route': {
+      deps: ['angular'],
+    },
+    'test/angular-mocks': {
+      deps: ['angular'],
+    },
+    'test/sinon': {
+      exports: 'sinon',
+    },
+  },
 });
 
 require(['less', 'rtp/main'], function(realMain) {

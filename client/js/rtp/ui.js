@@ -14,9 +14,11 @@
 
 define(function(require) {
   var $ = require('jquery');
+  var angular = require('angular');
   var rtp = require('rtp/ui-module');
   require('rtp/controllers/map-page');
   require('rtp/controllers/login-page');
+  require('rtp/directives/map');
   
   rtp.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
