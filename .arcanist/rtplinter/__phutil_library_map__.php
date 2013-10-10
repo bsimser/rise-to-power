@@ -12,6 +12,7 @@ phutil_register_library_map(array(
   array(
     'RtpGoFmtLinter' => 'linters/RtpGoFmtLinter.php',
     'RtpLintEngine' => 'engine/RtpLintEngine.php',
+    'RtpNewlineLinter' => 'linters/RtpNewlineLinter.php',
   ),
   'function' =>
   array(
@@ -20,5 +21,6 @@ phutil_register_library_map(array(
   array(
     'RtpGoFmtLinter' => 'ArcanistLinter',
     'RtpLintEngine' => 'ArcanistLintEngine',
+    'RtpNewlineLinter' => 'ArcanistLinter',
   ),
 ));

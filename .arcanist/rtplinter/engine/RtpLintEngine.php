@@ -19,6 +19,7 @@ final class RtpLintEngine extends ArcanistLintEngine {
   public function buildLinters(){
     $paths = $this->getPaths();
     $gofmt = new RtpGoFmtLinter();
+    $newlinelint = new RtpNewlineLinter();
 
     foreach($paths as $key => $path) {
       // Paths can include deleted files. Since we're only interested in linting
@@ -26,6 +27,7 @@ final class RtpLintEngine extends ArcanistLintEngine {
       if(!$this->pathExists($path)) {
         continue;
       }
+      $newlinelint->addPath($path);
       if (!preg_match('/\.go$/', $path)) {
         // This isn't a go file, so don't gofmt it.
         continue;
