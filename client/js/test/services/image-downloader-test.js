@@ -22,34 +22,34 @@ define(function(require) {
   var angular = require('test/angular-mocks');
   require('rtp/services/image-downloader');
   
-  var ImageDownloader, httpBackend, rootScope, SingleImageDownloader;
-  
-  beforeEach(function() {
-    var rtpTest = angular.module('test', ['rtp']);
-    // Replace the SingleImageDownloader with a version that uses $http, which
-    // we can mock. Otherwise, we'd have to have an actual server to talk to in 
-    // order to support Image.
-    rtpTest.factory('SingleImageDownloader', function($http) {
-      return function(path, success, failure) {
-        $http.get(path).then(success, failure);
-      };
-    });
-  });
-  
-  beforeEach(module('rtp'));
-  beforeEach(module('test'));
-  beforeEach(inject(function($httpBackend, _ImageDownloader_, _SingleImageDownloader_, $rootScope) {
-    ImageDownloader = _ImageDownloader_;
-    httpBackend = $httpBackend;
-    rootScope = $rootScope;
-    SingleImageDownloader = _SingleImageDownloader_;
-  }));
-  afterEach(function() {
-    httpBackend.verifyNoOutstandingExpectation();
-    httpBackend.verifyNoOutstandingRequest();
-  });
-  
   describe('Image Downloader', function() {
+    var ImageDownloader, httpBackend, rootScope, SingleImageDownloader;
+  
+    beforeEach(function() {
+      var rtpTest = angular.module('test', ['rtp']);
+      // Replace the SingleImageDownloader with a version that uses $http, which
+      // we can mock. Otherwise, we'd have to have an actual server to talk to in 
+      // order to support Image.
+      rtpTest.factory('SingleImageDownloader', function($http) {
+        return function(path, success, failure) {
+          $http.get(path).then(success, failure);
+        };
+      });
+    });
+  
+    beforeEach(module('rtp'));
+    beforeEach(module('test'));
+    beforeEach(inject(function($httpBackend, _ImageDownloader_, _SingleImageDownloader_, $rootScope) {
+      ImageDownloader = _ImageDownloader_;
+      httpBackend = $httpBackend;
+      rootScope = $rootScope;
+      SingleImageDownloader = _SingleImageDownloader_;
+    }));
+    afterEach(function() {
+      httpBackend.verifyNoOutstandingExpectation();
+      httpBackend.verifyNoOutstandingRequest();
+    });
+  
     var successSpy, failureSpy, notifySpy;
     beforeEach(function() {
       successSpy = sinon.spy();
@@ -112,6 +112,17 @@ define(function(require) {
       expect(successSpy).to.not.be.called;
       expect(failureSpy).to.be.calledOnce;
       expect(notifySpy).to.be.calledOnce;
+    });
+    
+    it('caches duplicate images', function() {
+      httpBackend.expect('GET', '/images/test.png').respond(200, 'an image');
+      ImageDownloader(['test.png']);
+      httpBackend.flush();
+      rootScope.$digest();
+      
+      ImageDownloader(['test.png']).then(successSpy, failureSpy, notifySpy);
+      rootScope.$digest();
+      expect(successSpy).to.be.calledOnce;
     });
   });
 });

@@ -24,13 +24,13 @@ define(function(require) {
   
   var element;
   
-  beforeEach(module('rtp'));
-  beforeEach(inject(function($compile, $rootScope) {
-    var link = $compile('<map style="width: 100px; height: 400px"></map>');
-    element = link($rootScope);
-  }));
-  
   describe('map directive', function() {
+    beforeEach(module('rtp'));
+    beforeEach(inject(function($compile, $rootScope) {
+      var link = $compile('<map style="width: 100px; height: 400px"></map>');
+      element = link($rootScope);
+    }));
+  
     it('sets the width and height properties of the canvas', function() {
       var canvas = element.find('canvas');
       expect(canvas.prop('width')).to.equal(100);

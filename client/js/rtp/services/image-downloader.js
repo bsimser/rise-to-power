@@ -24,19 +24,26 @@ define(function(require) {
       i.src = path;
       i.onload = successCallback;
       i.onerror = failureCallback;
+      return i;
     };
   });
   
   rtp.factory('ImageDownloader', function($q, SingleImageDownloader) {
+    var cachedImages = {};
     return function(images) {
       var deferred = $q.defer();
-      var imagesLeft = images.length;
+      var imagesThatNeedDownload = images.filter(function(i) {
+        return !(i in cachedImages);
+      });
+      var imagesLeft = imagesThatNeedDownload.length;
+      
       if (imagesLeft == 0) {
         deferred.resolve();
       } else {
-        images.forEach(function(image) {
-          SingleImageDownloader(IMAGES_DIR + image, function() {
+        imagesThatNeedDownload.forEach(function(image) {
+          var imageTag = SingleImageDownloader(IMAGES_DIR + image, function() {
             deferred.notify(image);
+            cachedImages[image] = imageTag;
             if (--imagesLeft == 0) {
               deferred.resolve();
             }
