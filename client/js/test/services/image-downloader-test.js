@@ -32,7 +32,7 @@ define(function(require) {
       // order to support Image.
       rtpTest.factory('SingleImageDownloader', function($http) {
         return function(path, success, failure) {
-          $http.get(path).then(success, failure);
+          return $http.get(path).then(success, failure);
         };
       });
     });
@@ -60,7 +60,7 @@ define(function(require) {
     it('downloads an image', function() {
       httpBackend.expect('GET', '/images/test.png').respond(200, 'an image');
       
-      ImageDownloader(['test.png']).then(successSpy, failureSpy, notifySpy);
+      ImageDownloader.download(['test.png']).then(successSpy, failureSpy, notifySpy);
 
       expect(successSpy).to.not.be.called;
       expect(failureSpy).to.not.be.called;
@@ -79,7 +79,7 @@ define(function(require) {
       httpBackend.expect('GET', '/images/test2.png').respond(200, 'an image');
       httpBackend.expect('GET', '/images/test3.png').respond(200, 'an image');
       
-      ImageDownloader(['test.png', 'test2.png', 'test3.png'])
+      ImageDownloader.download(['test.png', 'test2.png', 'test3.png'])
           .then(successSpy, failureSpy, notifySpy);
 
       expect(successSpy).to.not.be.called;
@@ -99,7 +99,7 @@ define(function(require) {
       httpBackend.expect('GET', '/images/test2.png').respond(500, 'badness!');
       httpBackend.expect('GET', '/images/test3.png').respond(200, 'an image');
       
-      ImageDownloader(['test.png', 'test2.png', 'test3.png'])
+      ImageDownloader.download(['test.png', 'test2.png', 'test3.png'])
           .then(successSpy, failureSpy, notifySpy);
 
       expect(successSpy).to.not.be.called;
@@ -116,13 +116,27 @@ define(function(require) {
     
     it('caches duplicate images', function() {
       httpBackend.expect('GET', '/images/test.png').respond(200, 'an image');
-      ImageDownloader(['test.png']);
+      ImageDownloader.download(['test.png']);
       httpBackend.flush();
       rootScope.$digest();
       
-      ImageDownloader(['test.png']).then(successSpy, failureSpy, notifySpy);
+      ImageDownloader.download(['test.png']).then(successSpy, failureSpy, notifySpy);
       rootScope.$digest();
       expect(successSpy).to.be.calledOnce;
+    });
+    
+    it('returns undefined for images that aren\'t found', function() {
+      expect(ImageDownloader.get('someimage.png')).to.be.undefined;
+    });
+    
+    it('returns the downloaded image', function() {
+      httpBackend.expect('GET', '/images/test.png').respond(200, 'an image');
+      ImageDownloader.download(['test.png']);
+      httpBackend.flush();
+      rootScope.$digest();
+      
+      // Can't test for actual Image here, because we mock out the Image part.
+      expect(ImageDownloader.get('test.png')).to.be.defined;
     });
   });
 });

@@ -34,7 +34,7 @@ define(function(require) {
     eventToMap: function(event, outPoint) {
       return CoordinateTransformer.pixelToMap(event.offsetX, event.offsetY, outPoint);
     },
-    
+
     // Converts a passed-in x, y in pixel coordinates to a map coordinate.
     // @param {number} x
     // @param {number} y
@@ -45,7 +45,7 @@ define(function(require) {
       outPoint.y = x / CELL_WIDTH - y / CELL_HEIGHT;
       return outPoint;
     },
-    
+
     // Converts a passed-in x, y, in pixel coordinates to an integer map 
     // coordinate.
     pixelToIntMap: function(x, y, outPoint) {
@@ -54,7 +54,7 @@ define(function(require) {
       outPoint.y = Math.floor(outPoint.y);
       return outPoint;
     },
-    
+
     // Converts a passed-in map coordinate to the pixel coordinate of its 
     // left corner. Note that we always return whole pixel coordinates.
     // @param {number} x
@@ -66,7 +66,7 @@ define(function(require) {
       outPoint.y = Math.floor((x - y) * HALF_CELL_HEIGHT);
       return outPoint;
     },
-    
+
     // Converts a map-coordinate to the top-left corner of the image that
     // represents a map square.
     mapToImageOrigin: function(x, y, outPoint) {

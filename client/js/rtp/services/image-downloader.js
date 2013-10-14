@@ -30,29 +30,34 @@ define(function(require) {
   
   rtp.factory('ImageDownloader', function($q, SingleImageDownloader) {
     var cachedImages = {};
-    return function(images) {
-      var deferred = $q.defer();
-      var imagesThatNeedDownload = images.filter(function(i) {
-        return !(i in cachedImages);
-      });
-      var imagesLeft = imagesThatNeedDownload.length;
-      
-      if (imagesLeft == 0) {
-        deferred.resolve();
-      } else {
-        imagesThatNeedDownload.forEach(function(image) {
-          var imageTag = SingleImageDownloader(IMAGES_DIR + image, function() {
-            deferred.notify(image);
-            cachedImages[image] = imageTag;
-            if (--imagesLeft == 0) {
-              deferred.resolve();
-            }
-          }, function() {
-            deferred.reject(image);
-          });
+    return {
+      download: function(images) {
+        var deferred = $q.defer();
+        var imagesThatNeedDownload = images.filter(function(i) {
+          return !(i in cachedImages);
         });
+        var imagesLeft = imagesThatNeedDownload.length;
+      
+        if (imagesLeft == 0) {
+          deferred.resolve();
+        } else {
+          imagesThatNeedDownload.forEach(function(image) {
+            var imageTag = SingleImageDownloader(IMAGES_DIR + image, function() {
+              deferred.notify(image);
+              cachedImages[image] = imageTag;
+              if (--imagesLeft == 0) {
+                deferred.resolve();
+              }
+            }, function() {
+              deferred.reject(image);
+            });
+          });
+        }
+        return deferred.promise;
+      },
+      get: function(image) {
+        return cachedImages[image];
       }
-      return deferred.promise;
     };
   });
 });
