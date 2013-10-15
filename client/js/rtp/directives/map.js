@@ -16,6 +16,7 @@ define(function(require) {
 	var rtp = require('rtp/ui-module');
   var Point = require('rtp/point');
   require('rtp/services/image-downloader');
+  require('rtp/services/coordinate-transformer');
   
   rtp.directive('map', function() {
     return {
@@ -26,10 +27,14 @@ define(function(require) {
     };
   });
   
-  var MapController = function($scope, $element, $attrs, ImageDownloader, $timeout) {
+  var MapController = function($scope, $element, $attrs, ImageDownloader, CoordinateTransformer, $timeout) {
     console.log('MapController loaded');
     this.images = ImageDownloader;
     this.timeout = $timeout;
+    this.coordinateTransformer = CoordinateTransformer;
+    
+    // The current translation of the map. Dragging moves the map around.
+    this.translation = new Point(0, 0);
     
     // Step 1: Measure the size of the canvas in the $element, and set the 
     // canvas width/height to that number.
@@ -73,6 +78,55 @@ define(function(require) {
     this.context.fillStyle = 'black';
     this.context.fillRect(0, 0, this.width, this.height);
     console.log('Map draw');
+    
+    var visibleSquares = this.getVisibleSquares();
+    // TODO(applmak): Implement a real renderer.
+    this.context.fillStyle = 'white';
+    var offset = new Point;
+    for (var i = 0; i < visibleSquares.length; i += 2) {
+      var mapX = visibleSquares[i], mapY = visibleSquares[i+1];
+      
+      this.coordinateTransformer.mapToPixel(mapX, mapY, offset);
+      this.context.fillRect(offset.x, offset.y, 5, 5);
+    }
+  };
+  // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
+  // @returns Array of numbers.
+  MapController.prototype.getVisibleSquares = function() {
+    var visibleSquares = [];
+    var ul = new Point, dl = new Point,
+        ur = new Point, dr = new Point;
+    this.coordinateTransformer.pixelToIntMap(0, 0, ul);
+    this.coordinateTransformer.pixelToIntMap(0, this.height, dl);
+    this.coordinateTransformer.pixelToIntMap(this.width, 0, ur);
+    this.coordinateTransformer.pixelToIntMap(this.width, this.height, dr);
+    
+    // Now, generate the list of visible squares in order.
+    // The order is top-to-bottom, left-to-right:
+    // 1 2 3 4 5
+    //6 7 8 9 0
+    // 1 2 3 4 5
+    // but this is hard because of the isometric grid.
+    
+    // Since +x is se and +y is ne, the length of the line ul<->ur is:
+    //  Math.abs(ur.x + 1 - ul.x)
+    var mapWidth = Math.abs(ur.x + 1 - ul.x);
+    // Also, the length of the line ul<->dl is:
+    //  Math.abs(dl.x + 1 - ul.x)
+    var mapHeight = Math.abs(dl.x + 1 - ul.x);
+    
+    for (var j = 0; j < mapHeight; ++j) {
+      for (var i = 0; i < mapWidth; ++i) {
+        visibleSquares.push(i + ul.x + j, i + ul.y - j);
+      }
+      if (j < mapHeight - 1) {
+        for (var i = -1; i < mapWidth; ++i) {
+          visibleSquares.push(1 + i + ul.x + j, i + ul.y - j);
+        }
+      }
+    }
+    
+    return visibleSquares;
   };
   rtp.controller('MapController', MapController);
   
