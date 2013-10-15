@@ -27,6 +27,7 @@ final class RtpLintEngine extends ArcanistLintEngine {
       if(!$this->pathExists($path)) {
         continue;
       }
+      if(basename($path) == ".phutil_module_cache") continue;
       $newlinelint->addPath($path);
       if (!preg_match('/\.go$/', $path)) {
         // This isn't a go file, so don't gofmt it.
@@ -34,6 +35,6 @@ final class RtpLintEngine extends ArcanistLintEngine {
       }
       $gofmt->addPath($path);
     }
-    return array($gofmt);
+    return array($gofmt, $newlinelint);
   }
 }

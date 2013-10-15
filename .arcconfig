@@ -4,5 +4,6 @@
   "load": [
     ".arcanist/rtplinter"
   ],
-  "lint.engine": "RtpLintEngine"
+  "lint.engine": "RtpLintEngine",
+  "unit.engine": "RtpUnitTestEngine"
 }
