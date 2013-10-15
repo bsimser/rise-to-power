@@ -14,6 +14,9 @@
 
 define(function(require) {
 	var rtp = require('rtp/ui-module');
+  var Point = require('rtp/point');
+  require('rtp/services/image-downloader');
+  
   rtp.directive('map', function() {
     return {
       restrict: 'E',
@@ -23,8 +26,10 @@ define(function(require) {
     };
   });
   
-  var MapController = function($scope, $element, $attrs) {
+  var MapController = function($scope, $element, $attrs, ImageDownloader, $timeout) {
     console.log('MapController loaded');
+    this.images = ImageDownloader;
+    this.timeout = $timeout;
     
     // Step 1: Measure the size of the canvas in the $element, and set the 
     // canvas width/height to that number.
@@ -39,7 +44,89 @@ define(function(require) {
     
     this.canvas.prop('width', this.width);
     this.canvas.prop('height', this.height);
+    
+    this.load();
+  };
+  MapController.prototype.load = function() {
+    // perform standard initialization tasks... show a loading bar until they 
+    // are finished.
+    var imagesToDownload = IMAGES.length;
+    var loadingBar = new LoadingBar(imagesToDownload, this.width, this.height, this.context);
+    loadingBar.draw();
+    
+    var mapController = this;
+    this.images.download(IMAGES).then(function() {
+      console.log('DONE LOADING IMAGES!');
+      loadingBar.finish();
+      loadingBar.draw();
+      mapController.timeout(mapController.draw.bind(mapController), 0);
+    }, function(error) {
+      console.error('ERROR LOADING IMAGES!');
+    }, function() {
+      console.log('redraw');
+      // an image was downloaded!
+      loadingBar.advance();
+      loadingBar.draw();
+    });
+  };
+  MapController.prototype.draw = function() {
+    this.context.fillStyle = 'black';
+    this.context.fillRect(0, 0, this.width, this.height);
+    console.log('Map draw');
+  };
+  rtp.controller('MapController', MapController);
+  
+  
+  var LoadingBar = function(max, width, height, context) {
+    this.progress = 0;
+    this.max = max;
+    this.width = width;
+    this.height = height;
+    this.context = context;
+  };
+  LoadingBar.prototype.advance = function() {
+    console.assert(this.progress < this.max, 'LoadingBar advanced too far!');
+    this.progress++;
+  };
+  LoadingBar.prototype.finish = function() {
+    this.progress = this.max;
+  };
+  LoadingBar.prototype.draw = function() {
+    var c = this.context;
+    c.save();
+    c.fillStyle = 'black';
+    c.fillRect(0, 0, this.width, this.height);
+    
+    // The Loading Bar should be about 80% of the width of the context:
+    var loadingBarWidth = Math.floor(0.8 * this.width);
+    var loadingBarHeight = 20;
+    
+    var ul = new Point(Math.floor(this.width / 2 - loadingBarWidth / 2),
+                       Math.floor(this.height / 2 - loadingBarHeight / 2));
+    
+    c.strokeStyle = 'white';
+    c.strokeRect(ul.x, ul.y, loadingBarWidth, loadingBarHeight);
+    
+    ul.x += 2;
+    ul.y += 2;
+    
+    var progressWidth = Math.ceil((loadingBarWidth - 4) * this.progress / this.max);
+    
+    c.fillStyle = 'yellow';
+    c.fillRect(ul.x, ul.y, progressWidth, loadingBarHeight - 4);
+    
+    c.restore();
   };
   
-  rtp.controller('MapController', MapController);
+  var IMAGES = [
+    "buildings/barracks-1.png",
+    "buildings/construction.png",
+    "buildings/courthouse-1.png",
+    "buildings/extractor.png",
+    "buildings/farm.png",
+    "buildings/refinery-1.png",
+    "terrain/field.png",
+    "terrain/forest.png",
+    "terrain/sea.png",
+  ];
 });

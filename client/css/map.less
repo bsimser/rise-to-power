@@ -12,8 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-body {
-	@import "login.less";
-	@import "map.less";
-	font: 13px "Lucida Grande", Helvetica, Arial, sans-serif;
+.fullscreen {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+@detailHeight: 150px;
+@orderWidth: 300px;
+.map {
+	position: absolute;
+	left: 0;
+	right: @orderWidth;
+	top: 0;
+	bottom: @detailHeight;
+}
+
+.order-list {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: @orderWidth;
+	right: 0;
+}
+
+.detail-view {
+	position: absolute;
+	height: @detailHeight;
+	bottom: 0;
+	left: 0;
+	right: @orderWidth;
 }
