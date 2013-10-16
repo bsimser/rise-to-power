@@ -40,12 +40,18 @@ define(function(require) {
   describe('map directive controller', function() {
     var mapController;
     beforeEach(module('rtp'));
-    beforeEach(inject(function($rootScope, $controller) {
+    beforeEach(inject(function($rootScope, $controller, ResizeObserver) {
       // Note: width, height chosen to be 2 x square size
       var element = $('<div style="width:140px;height:96px"><canvas width="140" height="96"></canvas></div>');
       mapController = $controller(
-          'MapController', {$scope: $rootScope, $element: element, $attrs:{}});
+          'MapController', {$scope: $rootScope, $element: element, $attrs:{},
+                            ResizeObserver: ResizeObserver});
+      // Disable drawing in unit tests.
+      sinon.stub(mapController.constructor.prototype, 'draw');
     }));
+    afterEach(function() {
+      mapController.constructor.prototype.draw.restore();
+    });
     
     it('calculates the right visible squares', function() {
       var visibleSquares = mapController.getVisibleSquares();
@@ -64,6 +70,12 @@ define(function(require) {
         2, -2, 3, -1, 4, 0,
         2, -3, 3, -2, 4, -1, 5, 0
       ]);
+    });
+    
+    it('listens for resize events', function() {
+      sinon.stub(mapController, 'adjustCanvasSize');
+      $(window).trigger('resize');
+      expect(mapController.adjustCanvasSize).to.be.calledOnce;
     });
   });
 });

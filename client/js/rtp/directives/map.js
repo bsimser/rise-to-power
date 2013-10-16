@@ -17,6 +17,7 @@ define(function(require) {
   var Point = require('rtp/point');
   require('rtp/services/image-downloader');
   require('rtp/services/coordinate-transformer');
+  require('rtp/services/resize-observer');
   
   rtp.directive('map', function() {
     return {
@@ -27,7 +28,8 @@ define(function(require) {
     };
   });
   
-  var MapController = function($scope, $element, $attrs, ImageDownloader, CoordinateTransformer, $timeout) {
+  var MapController = function($scope, $element, $attrs, ImageDownloader,
+                               CoordinateTransformer, ResizeObserver, $timeout) {
     console.log('MapController loaded');
     this.images = ImageDownloader;
     this.timeout = $timeout;
@@ -36,22 +38,31 @@ define(function(require) {
     // The current translation of the map. Dragging moves the map around.
     this.translation = new Point(0, 0);
     
-    // Step 1: Measure the size of the canvas in the $element, and set the 
-    // canvas width/height to that number.
-    this.width = $element.width();
-    this.height = $element.height();
-    
+    this.container = $element;
     this.canvas = $element.find('canvas');
     this.context = this.canvas[0].getContext('2d');
+    
     if (!this.context) {
       console.error('NO CANVAS CONTEXT');
     }
-    
-    this.canvas.prop('width', this.width);
-    this.canvas.prop('height', this.height);
+  
+    this.adjustCanvasSize();
+    var mapController = this;
+    ResizeObserver(function() {
+      mapController.adjustCanvasSize();
+      mapController.redraw(true);
+    });
     
     this.load();
   };
+  MapController.prototype.adjustCanvasSize = function() {
+    this.width = this.container.width();
+    this.height = this.container.height();
+  
+    this.canvas.prop('width', this.width);
+    this.canvas.prop('height', this.height);
+  };
+
   MapController.prototype.load = function() {
     // perform standard initialization tasks... show a loading bar until they 
     // are finished.
@@ -64,15 +75,25 @@ define(function(require) {
       console.log('DONE LOADING IMAGES!');
       loadingBar.finish();
       loadingBar.draw();
-      mapController.timeout(mapController.draw.bind(mapController), 0);
+      mapController.redraw();
     }, function(error) {
       console.error('ERROR LOADING IMAGES!');
     }, function() {
-      console.log('redraw');
       // an image was downloaded!
       loadingBar.advance();
       loadingBar.draw();
     });
+  };
+  
+  // The standard way to schedule drawing to occur.
+  // @param {boolean} rightNow When true, draw on THIS frame. When false, draw
+  //     on the NEXT frame.
+  MapController.prototype.redraw = function(rightNow) {
+    if (rightNow) {
+      this.draw();
+    } else {
+      this.timeout(this.draw.bind(this), 0);
+    }
   };
   MapController.prototype.draw = function() {
     this.context.fillStyle = 'black';
