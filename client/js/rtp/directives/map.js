@@ -15,6 +15,7 @@
 define(function(require) {
 	var rtp = require('rtp/ui-module');
   var Point = require('rtp/point');
+  var LoadingBar = require('rtp/loading-bar');
   require('rtp/services/image-downloader');
   require('rtp/services/coordinate-transformer');
   require('rtp/services/resize-observer');
@@ -148,48 +149,6 @@ define(function(require) {
     return visibleSquares;
   };
   rtp.controller('MapController', MapController);
-  
-  
-  var LoadingBar = function(max, width, height, context) {
-    this.progress = 0;
-    this.max = max;
-    this.width = width;
-    this.height = height;
-    this.context = context;
-  };
-  LoadingBar.prototype.advance = function() {
-    console.assert(this.progress < this.max, 'LoadingBar advanced too far!');
-    this.progress++;
-  };
-  LoadingBar.prototype.finish = function() {
-    this.progress = this.max;
-  };
-  LoadingBar.prototype.draw = function() {
-    var c = this.context;
-    c.save();
-    c.fillStyle = 'black';
-    c.fillRect(0, 0, this.width, this.height);
-    
-    // The Loading Bar should be about 80% of the width of the context:
-    var loadingBarWidth = Math.floor(0.8 * this.width);
-    var loadingBarHeight = 20;
-    
-    var ul = new Point(Math.floor(this.width / 2 - loadingBarWidth / 2),
-                       Math.floor(this.height / 2 - loadingBarHeight / 2));
-    
-    c.strokeStyle = 'white';
-    c.strokeRect(ul.x, ul.y, loadingBarWidth, loadingBarHeight);
-    
-    ul.x += 2;
-    ul.y += 2;
-    
-    var progressWidth = Math.ceil((loadingBarWidth - 4) * this.progress / this.max);
-    
-    c.fillStyle = 'yellow';
-    c.fillRect(ul.x, ul.y, progressWidth, loadingBarHeight - 4);
-    
-    c.restore();
-  };
   
   var IMAGES = [
     "buildings/barracks-1.png",
