@@ -54,13 +54,15 @@ define(function(require) {
       // four in the next offset row,
       // three in the next real row,
       // four in the next offset row,
-      // and finally three in the last real row.
+      // three in the last real row.
+      // and finally four in the last real row.
       expect(visibleSquares).to.deep.equal([
         0, 0, 1, 1, 2, 2,
         0, -1, 1, 0, 2, 1, 3, 2,
         1, -1, 2, 0, 3, 1,
         1, -2, 2, -1, 3, 0, 4, 1,
-        2, -2, 3, -1, 4, 0
+        2, -2, 3, -1, 4, 0,
+        2, -3, 3, -2, 4, -1, 5, 0
       ]);
     });
   });

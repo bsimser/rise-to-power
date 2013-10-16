@@ -86,8 +86,8 @@ define(function(require) {
     for (var i = 0; i < visibleSquares.length; i += 2) {
       var mapX = visibleSquares[i], mapY = visibleSquares[i+1];
       
-      this.coordinateTransformer.mapToPixel(mapX, mapY, offset);
-      this.context.fillRect(offset.x, offset.y, 5, 5);
+      this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
+      this.context.drawImage(this.images.get('terrain/field.png'), offset.x, offset.y);
     }
   };
   // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
@@ -119,10 +119,8 @@ define(function(require) {
       for (var i = 0; i < mapWidth; ++i) {
         visibleSquares.push(i + ul.x + j, i + ul.y - j);
       }
-      if (j < mapHeight - 1) {
-        for (var i = -1; i < mapWidth; ++i) {
-          visibleSquares.push(1 + i + ul.x + j, i + ul.y - j);
-        }
+      for (var i = -1; i < mapWidth; ++i) {
+        visibleSquares.push(1 + i + ul.x + j, i + ul.y - j);
       }
     }
     
