@@ -72,6 +72,22 @@ define(function(require) {
       ]);
     });
     
+    it('calculates the right visible squares when translated', function() {
+      // Shift by +2 in the map x:
+      mapController.translation.x = 70;
+      mapController.translation.y = 48;
+      
+      var visibleSquares = mapController.getVisibleSquares();
+      expect(visibleSquares).to.deep.equal([
+        2, 0, 3, 1, 4, 2,
+        2, -1, 3, 0, 4, 1, 5, 2,
+        3, -1, 4, 0, 5, 1,
+        3, -2, 4, -1, 5, 0, 6, 1,
+        4, -2, 5, -1, 6, 0,
+        4, -3, 5, -2, 6, -1, 7, 0
+      ]);
+    });
+    
     it('listens for resize events', function() {
       sinon.stub(mapController, 'adjustCanvasSize');
       $(window).trigger('resize');

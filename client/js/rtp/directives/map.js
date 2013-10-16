@@ -118,10 +118,10 @@ define(function(require) {
     var visibleSquares = [];
     var ul = new Point, dl = new Point,
         ur = new Point, dr = new Point;
-    this.coordinateTransformer.pixelToIntMap(0, 0, ul);
-    this.coordinateTransformer.pixelToIntMap(0, this.height, dl);
-    this.coordinateTransformer.pixelToIntMap(this.width, 0, ur);
-    this.coordinateTransformer.pixelToIntMap(this.width, this.height, dr);
+    this.coordinateTransformer.pixelToIntMap(this.translation.x, this.translation.y, ul);
+    this.coordinateTransformer.pixelToIntMap(this.translation.x, this.translation.y + this.height, dl);
+    this.coordinateTransformer.pixelToIntMap(this.translation.x + this.width, this.translation.y, ur);
+    this.coordinateTransformer.pixelToIntMap(this.translation.x + this.width, this.translation.y + this.height, dr);
     
     // Now, generate the list of visible squares in order.
     // The order is top-to-bottom, left-to-right:
