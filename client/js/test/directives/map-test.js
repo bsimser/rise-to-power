@@ -43,6 +43,7 @@ define(function(require) {
     beforeEach(inject(function($rootScope, $controller, ResizeObserver) {
       // Note: width, height chosen to be 2 x square size
       var element = $('<div style="width:140px;height:96px"><canvas width="140" height="96"></canvas></div>');
+      ResizeObserver.reset();
       mapController = $controller(
           'MapController', {$scope: $rootScope, $element: element, $attrs:{},
                             ResizeObserver: ResizeObserver});

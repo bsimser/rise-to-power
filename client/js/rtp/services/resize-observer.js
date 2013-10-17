@@ -25,8 +25,14 @@ define(function(require) {
       });
     });
     
-    return function(callback) {
+    var ResizeObserver = function(callback) {
       observers.push(callback);
     };
+    // Only for testing, really, but resets the callback list back to empty.
+    ResizeObserver.reset = function() {
+      observers.length = 0;
+    };
+    
+    return ResizeObserver;
   });
 });

@@ -28,6 +28,7 @@ define(function(require) {
     beforeEach(module('rtp'));
     beforeEach(inject(function(_ResizeObserver_, $window) {
       ResizeObserver = _ResizeObserver_;
+      ResizeObserver.reset();
       windowService = $($window);
     }));
     
