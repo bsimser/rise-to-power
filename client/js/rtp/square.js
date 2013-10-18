@@ -13,17 +13,23 @@
 // limitations under the License.
 
 define(function(require) {
-  var rtp = require('rtp/ui-module');
-  var GameState = require('rtp/game-state');
-  var FakeGameStateGenerator = require('rtp/fake-game-state-generator');
+  var Terrain = require('rtp/terrain');
   
-  rtp.controller('MapPageController', function($scope, $timeout) {
-    console.log('MapPageController inited');
-    // TODO(applmak): Once the server supports it, here's a good place to read
-    // the entire game state. For the moment, we'll fake it.
-    var state = FakeGameStateGenerator();
-    $timeout(function() {
-      $scope.state = state;
-    }, 2000);
-  });
+  var Square = function(id, terrain, x, y, buildingProduction, building, resource) {
+    this.id = id;
+    this.terrain = terrain;
+    this.x = x;
+    this.y = y;
+    this.buildingProduction = buildingProduction;
+    this.building = building;
+    this.resource = resource;
+  };
+  
+  // Deserializes a JSON object into a Square instance.
+  Square.deserialize = function(square) {
+    return new Square(square.id, Terrain.byId[square.terrain], square.x, square.y,
+                      square.buildingProduction, square.building, square.resource);
+  };
+  
+  return Square;
 });

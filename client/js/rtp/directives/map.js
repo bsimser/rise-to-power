@@ -35,6 +35,7 @@ define(function(require) {
     this.images = ImageDownloader;
     this.timeout = $timeout;
     this.coordinateTransformer = CoordinateTransformer;
+    this.scope = $scope;
     
     // The current translation of the map. Dragging moves the map around.
     this.translation = new Point(0, 0);
@@ -48,10 +49,14 @@ define(function(require) {
     }
   
     this.adjustCanvasSize();
+    this.loadingComplete = false;
+    
     var mapController = this;
     ResizeObserver(function() {
       mapController.adjustCanvasSize();
-      mapController.redraw(true);
+      if (mapController.loadingComplete) {
+        mapController.redraw(true);
+      }
     });
     
     this.load();
@@ -68,21 +73,36 @@ define(function(require) {
     // perform standard initialization tasks... show a loading bar until they 
     // are finished.
     var imagesToDownload = IMAGES.length;
-    var loadingBar = new LoadingBar(imagesToDownload, this.width, this.height, this.context);
+    var loadingBar = new LoadingBar(imagesToDownload + 1, this.width, this.height, this.context);
     loadingBar.draw();
     
     var mapController = this;
+    
+    // In order to avoid drawing the map until both loaders are finished, we use
+    // this variable to denote how many more loading tasks need to finish before
+    // we draw.
+    var loadingThingsToFinish = 2;
     this.images.download(IMAGES).then(function() {
-      console.log('DONE LOADING IMAGES!');
-      loadingBar.finish();
-      loadingBar.draw();
-      mapController.redraw();
+      if (--loadingThingsToFinish == 0) {
+        mapController.loadingComplete = true;
+        mapController.redraw();
+      }
     }, function(error) {
       console.error('ERROR LOADING IMAGES!');
     }, function() {
       // an image was downloaded!
       loadingBar.advance();
       loadingBar.draw();
+    });
+    
+    this.scope.$watch('state', function(state) {
+      if (state) {
+        console.log('state loaded!');
+        if (--loadingThingsToFinish == 0) {
+          mapController.loadingComplete = true;
+          mapController.redraw();
+        }
+      }
     });
   };
   
@@ -97,6 +117,8 @@ define(function(require) {
     }
   };
   MapController.prototype.draw = function() {
+    // ASSERT: There is a state on the scope.
+    
     this.context.fillStyle = 'black';
     this.context.fillRect(0, 0, this.width, this.height);
     console.log('Map draw');
@@ -108,8 +130,11 @@ define(function(require) {
     for (var i = 0; i < visibleSquares.length; i += 2) {
       var mapX = visibleSquares[i], mapY = visibleSquares[i+1];
       
+      var square = this.scope.state.getSquareAt(mapX, mapY);
       this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
-      this.context.drawImage(this.images.get('terrain/field.png'), offset.x, offset.y);
+      
+      var image = this.images.get(square.terrain.image);
+      this.context.drawImage(image, offset.x, offset.y);
     }
   };
   // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
