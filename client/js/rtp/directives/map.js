@@ -162,11 +162,14 @@ define(function(require) {
     //  Math.abs(dl.x + 1 - ul.x)
     var mapHeight = Math.abs(dl.x + 1 - ul.x);
     
-    for (var j = 0; j < mapHeight; ++j) {
-      for (var i = 0; i < mapWidth; ++i) {
+    // Also also, we need to iterate from -1,-1 to mapWidth, mapHeight due to 
+    // literal edge cases.
+    
+    for (var j = -1; j <= mapHeight; ++j) {
+      for (var i = -1; i <= mapWidth; ++i) {
         visibleSquares.push(i + ul.x + j, i + ul.y - j);
       }
-      for (var i = -1; i < mapWidth; ++i) {
+      for (var i = -1; i <= mapWidth; ++i) {
         visibleSquares.push(1 + i + ul.x + j, i + ul.y - j);
       }
     }

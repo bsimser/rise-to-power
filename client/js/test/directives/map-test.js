@@ -41,8 +41,8 @@ define(function(require) {
     var mapController;
     beforeEach(module('rtp'));
     beforeEach(inject(function($rootScope, $controller, ResizeObserver) {
-      // Note: width, height chosen to be 2 x square size
-      var element = $('<div style="width:140px;height:96px"><canvas width="140" height="96"></canvas></div>');
+      // Note: width, height chosen to be 1 x square size
+      var element = $('<div style="width:70px;height:48px"><canvas width="70" height="48"></canvas></div>');
       ResizeObserver.reset();
       mapController = $controller(
           'MapController', {$scope: $rootScope, $element: element, $attrs:{},
@@ -57,18 +57,23 @@ define(function(require) {
     it('calculates the right visible squares', function() {
       var visibleSquares = mapController.getVisibleSquares();
       // Because 0,0 on screen is the left corner of the 0,0 map tile (with no
-      // translation), we expect to see three tiles in the first row,
-      // four in the next offset row,
-      // three in the next real row,
-      // four in the next offset row,
-      // three in the last real row.
-      // and finally four in the last real row.
+      // translation), we expect to see:
+      // [-2, 0] -> [1, 3] (4)
+      // [-1, 0] -> [2, 3] (4)
+      // [-1, -1] -> [2, 2] (4)
+      // [0, -1] -> [3, 2] (4)
+      // [0, -2] -> [3, 1] (4)
+      // [1, -2] -> [4, 1] (4)
+      // [1, -3] -> [4, 0] (4)
+      // [2, -3] -> [5, 0] (4)
       expect(visibleSquares).to.deep.equal([
-        0, 0, 1, 1, 2, 2,
+        -2, 0, -1, 1, 0, 2, 1, 3,
+        -1, 0, 0, 1, 1, 2, 2, 3,
+        -1, -1, 0, 0, 1, 1, 2, 2,
         0, -1, 1, 0, 2, 1, 3, 2,
-        1, -1, 2, 0, 3, 1,
+        0, -2, 1, -1, 2, 0, 3, 1,
         1, -2, 2, -1, 3, 0, 4, 1,
-        2, -2, 3, -1, 4, 0,
+        1, -3, 2, -2, 3, -1, 4, 0,
         2, -3, 3, -2, 4, -1, 5, 0
       ]);
     });
@@ -80,11 +85,13 @@ define(function(require) {
       
       var visibleSquares = mapController.getVisibleSquares();
       expect(visibleSquares).to.deep.equal([
-        2, 0, 3, 1, 4, 2,
+        0, 0, 1, 1, 2, 2, 3, 3,
+        1, 0, 2, 1, 3, 2, 4, 3,
+        1, -1, 2, 0, 3, 1, 4, 2,
         2, -1, 3, 0, 4, 1, 5, 2,
-        3, -1, 4, 0, 5, 1,
+        2, -2, 3, -1, 4, 0, 5, 1,
         3, -2, 4, -1, 5, 0, 6, 1,
-        4, -2, 5, -1, 6, 0,
+        3, -3, 4, -2, 5, -1, 6, 0,
         4, -3, 5, -2, 6, -1, 7, 0
       ]);
     });
