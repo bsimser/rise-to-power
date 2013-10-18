@@ -20,6 +20,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+	"code.google.com/p/rise-to-power/web/rest"
+	"code.google.com/p/rise-to-power/web/session"
 )
 
 var (
@@ -29,16 +32,16 @@ var (
 )
 
 type DefaultIndex struct {
-  dir http.Dir
+	dir http.Dir
 }
 
 func (d DefaultIndex) Open(name string) (http.File, error) {
-  log.Printf("Request: %v", name)
-  f, err := d.dir.Open(name)
-  if err != nil {
-    f, err = d.dir.Open("/index.html")
-  }
-  return f, err
+	log.Printf("Request: %v", name)
+	f, err := d.dir.Open(name)
+	if err != nil {
+		f, err = d.dir.Open("/index.html")
+	}
+	return f, err
 }
 
 func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,12 +50,15 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
+	sessionStore := session.NewInMemoryStore()
 	muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
+	// TODO(jwall): handle codecs.
+	muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}))
+	muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}))
 	muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
-	// Note to test this for now:
-	// curl -v --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
+	// Note(jwall): to test this for now:
+	// curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
 	http.Handle("/", muxer)
-	http.HandleFunc("/_api/login", AuthHandler)
 	log.Printf("Server now listening on %v", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

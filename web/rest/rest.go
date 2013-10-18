@@ -28,6 +28,7 @@ package rest
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -66,19 +67,21 @@ func (h *Handler) dispatch(hw HeaderWriter, r *http.Request, c Codec) (status in
 // TODO(jwall): Unittests
 // ServeHTTP implements the http.Handler interface for a Handler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	if c, ok := h.codecs[r.Header.Get("Content-Type")]; ok {
 		status, result := h.dispatch(w, r, c)
 		w.WriteHeader(status)
 		c.Serialize(w, result)
 	} else {
-		// FIXME(jwall): Handle invalid content-type
+		// 406 Not acceptable
+		log.Printf("Invalid content type specified")
+		w.WriteHeader(406)
 	}
 }
 
 // New sets up an EndPoint as an http.Handler.
 func New(ep EndPoint) http.Handler {
-	// TODO(jwall) register with different request methods here.
-	h := &Handler{EndPoint: ep, codecs: map[string]Codec{"application/json": jsonCodec{}}}
+	h := &Handler{EndPoint: ep, handles: make(map[string]bool), codecs: map[string]Codec{"application/json": jsonCodec{}}}
 	_, ok := ep.(Post)
 	h.handles["POST"] = ok
 	_, ok = ep.(Get)

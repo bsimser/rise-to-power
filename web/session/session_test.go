@@ -14,38 +14,34 @@
 
 package session
 
-import (
-	"testing"
-
-	"github.com/gorilla/sessions"
-)
+import "testing"
 
 func TestSessionStorage(t *testing.T) {
 	// First assert that we satisfy the interface
-	var store sessions.Store
+	var store Store
 	store = NewInMemoryStore()
 
 	// Now we want to test the actual concrete implementation.
 	memStore := store.(*inMemorySessionStore)
 	// No session exists case.
-	s, err := memStore.Get(nil, "foo session")
+	s, err := memStore.Get("foo session")
 	if s != nil || err != NoSuchSession {
 		t.Errorf("Expected nil session with error. Got %v with %v", s, err)
 	}
 
 	// Create a new session
-	s, err = memStore.New(nil, "foo session")
+	s, err = memStore.StartSession("foo session")
 	if s == nil || err != nil {
 		t.Errorf("Expected new session with no error. Got %v with %v", s, err)
 	}
 
 	// Save the session
-	if err = memStore.Save(nil, nil, s); err != nil {
+	if err = memStore.Save(s); err != nil {
 		t.Errorf("Unexpected error saving session. %v", err)
 	}
 
 	// Retrieve the session.
-	s, err = memStore.Get(nil, "foo session")
+	s, err = memStore.Get("foo session")
 	if s == nil || err != nil {
 		t.Logf("sessions: %v", memStore.store)
 		t.Errorf("Expected valid session with error. Got %v with %v", s, err)

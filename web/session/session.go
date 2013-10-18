@@ -16,10 +16,8 @@ package session
 
 import (
 	"fmt"
-	"net/http"
-	"sync"
 
-	"github.com/gorilla/sessions"
+	"sync"
 )
 
 var (
@@ -28,18 +26,30 @@ var (
 	SessionExpired = fmt.Errorf("Session Expired")
 )
 
+type Session struct {
+	ID     string
+	Values map[string]interface{}
+}
+
+type Store interface {
+	Get(name string) (*Session, error)
+	Save(*Session) error
+	StartSession(name string) (*Session, error)
+	EndSession(name string) error
+}
+
 type inMemorySessionStore struct {
 	sync.RWMutex
-	store map[string]*sessions.Session
+	store map[string]*Session
 }
 
 // NewInMemoryStore returns a thread safe in memory implementation of a
 // sessions.Store.
-func NewInMemoryStore() sessions.Store {
-	return &inMemorySessionStore{store: make(map[string]*sessions.Session)}
+func NewInMemoryStore() Store {
+	return &inMemorySessionStore{store: make(map[string]*Session)}
 }
 
-func (s *inMemorySessionStore) Get(r *http.Request, name string) (*sessions.Session, error) {
+func (s *inMemorySessionStore) Get(name string) (*Session, error) {
 	s.RLock()
 	defer s.RUnlock()
 	if s, ok := s.store[name]; ok {
@@ -49,7 +59,7 @@ func (s *inMemorySessionStore) Get(r *http.Request, name string) (*sessions.Sess
 	return nil, NoSuchSession
 }
 
-func (s *inMemorySessionStore) Save(r *http.Request, w http.ResponseWriter, sess *sessions.Session) error {
+func (s *inMemorySessionStore) Save(sess *Session) error {
 	s.Lock()
 	defer s.Unlock()
 	s.store[string(sess.ID)] = sess
@@ -57,9 +67,22 @@ func (s *inMemorySessionStore) Save(r *http.Request, w http.ResponseWriter, sess
 	return nil
 }
 
-func (s *inMemorySessionStore) New(r *http.Request, name string) (*sessions.Session, error) {
-	// in memory stores never fail to create a new session.
-	sess := sessions.NewSession(s, name)
-	sess.ID = name
-	return sess, nil
+func (s *inMemorySessionStore) StartSession(name string) (*Session, error) {
+	s.Lock()
+	defer s.Unlock()
+	s.store[name] = New(name)
+	// in memory stores never fail to store.
+	return s.store[name], nil
+}
+
+func (s *inMemorySessionStore) EndSession(name string) error {
+	s.Lock()
+	defer s.Unlock()
+	delete(s.store, name)
+	// in memory stores never fail to delete
+	return nil
+}
+
+func New(name string) *Session {
+	return &Session{ID: name, Values: make(map[string]interface{})}
 }
