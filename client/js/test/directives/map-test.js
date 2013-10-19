@@ -38,12 +38,13 @@ define(function(require) {
   });
   
   describe('map directive controller', function() {
-    var mapController;
+    var mapController, scope, element;
     beforeEach(module('rtp'));
     beforeEach(inject(function($rootScope, $controller, ResizeObserver) {
       // Note: width, height chosen to be 1 x square size
-      var element = $('<div style="width:70px;height:48px"><canvas width="70" height="48"></canvas></div>');
+      element = $('<div style="width:70px;height:48px"><canvas width="70" height="48"></canvas></div>');
       ResizeObserver.reset();
+      scope = $rootScope;
       mapController = $controller(
           'MapController', {$scope: $rootScope, $element: element, $attrs:{},
                             ResizeObserver: ResizeObserver});
@@ -100,6 +101,12 @@ define(function(require) {
       sinon.stub(mapController, 'adjustCanvasSize');
       $(window).trigger('resize');
       expect(mapController.adjustCanvasSize).to.be.calledOnce;
+    });
+    
+    it('publishes the hover square on the scope', function() {
+      expect(scope.hoverSquare).to.deep.equal({x: 0, y: 0});
+      element.trigger($.Event('mousemove', {offsetX: 70, offsetY: 0}));
+      expect(scope.hoverSquare).to.deep.equal({x: 1, y: 1});
     });
   });
 });

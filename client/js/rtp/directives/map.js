@@ -23,6 +23,10 @@ define(function(require) {
   
   rtp.directive('map', function() {
     return {
+      scope: {
+        state: '=',
+        hoverSquare: '=hover'
+      },
       restrict: 'E',
       replace: true,
       template: '<div><canvas></canvas></div>',
@@ -63,6 +67,14 @@ define(function(require) {
     
     DragHandler(this.container, this);
         
+    this.scope.hoverSquare = new Point(0, 0);
+    this.container.on('mousemove', function(e) {
+      // Publish the hover square coordinate on the $scope as hoverSquare
+      $scope.$apply(function() {
+        CoordinateTransformer.pixelToIntMap(e.offsetX, e.offsetY, $scope.hoverSquare);
+      });
+    });
+
     this.load();
   };
   MapController.prototype.mouseDown = function(e) {
