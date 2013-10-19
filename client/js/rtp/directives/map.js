@@ -19,6 +19,7 @@ define(function(require) {
   require('rtp/services/image-downloader');
   require('rtp/services/coordinate-transformer');
   require('rtp/services/resize-observer');
+  require('rtp/services/drag-handler');
   
   rtp.directive('map', function() {
     return {
@@ -30,7 +31,8 @@ define(function(require) {
   });
   
   var MapController = function($scope, $element, $attrs, ImageDownloader,
-                               CoordinateTransformer, ResizeObserver, $timeout) {
+                               CoordinateTransformer, ResizeObserver, DragHandler,
+                               $timeout) {
     console.log('MapController loaded');
     this.images = ImageDownloader;
     this.timeout = $timeout;
@@ -59,8 +61,22 @@ define(function(require) {
       }
     });
     
+    DragHandler(this.container, this);
+        
     this.load();
   };
+  MapController.prototype.mouseDown = function(e) {
+    this.startDragX = e.offsetX;
+    this.startDragY = e.offsetY;
+  };
+  MapController.prototype.mouseDrag = function(e) {
+    this.translation.x -= (e.offsetX - this.startDragX);
+    this.translation.y -= (e.offsetY - this.startDragY);
+    this.startDragX = e.offsetX;
+    this.startDragY = e.offsetY;
+    this.redraw(true);
+  };
+  
   MapController.prototype.adjustCanvasSize = function() {
     this.width = this.container.width();
     this.height = this.container.height();
@@ -132,9 +148,11 @@ define(function(require) {
       
       var square = this.scope.state.getSquareAt(mapX, mapY);
       this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
-      
+
       var image = this.images.get(square.terrain.image);
-      this.context.drawImage(image, offset.x, offset.y);
+      this.context.drawImage(image,
+                             offset.x - this.translation.x,
+                             offset.y - this.translation.y);
     }
   };
   // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
