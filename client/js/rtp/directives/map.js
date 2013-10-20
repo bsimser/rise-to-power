@@ -161,10 +161,12 @@ define(function(require) {
       var square = this.scope.state.getSquareAt(mapX, mapY);
       this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
 
-      var image = this.images.get(square.terrain.image);
-      this.context.drawImage(image,
-                             offset.x - this.translation.x,
-                             offset.y - this.translation.y);
+      if (square) {
+        var image = this.images.get(square.terrain.image);
+        this.context.drawImage(image,
+                               offset.x - this.translation.x,
+                               offset.y - this.translation.y);
+      }
     }
   };
   // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
