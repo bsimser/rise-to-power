@@ -26,7 +26,8 @@ define(function(require) {
   describe('GameState', function() {
     var state;
     beforeEach(function() {
-      state = new GameState([new Square('', Terrain.FIELD, 1, 3, undefined, undefined, undefined)]);
+      state = new GameState([new Square('', Terrain.FIELD, 1, 3, undefined, undefined, undefined),
+                             new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)]);
     });
     it('can return a square by location', function() {
       var square = state.getSquareAt(1, 3);
@@ -36,6 +37,10 @@ define(function(require) {
     });
     it('returns undefined when asked about a square it doesn\'t know about', function() {
       expect(state.getSquareAt(0, 0)).to.be.undefined;
+    });
+    it('can return neighbor squares', function() {
+      var neighbors = state.getNeighborsOfSquareAt(1, 3, {});
+      expect(neighbors.ur).to.equal(state.getSquareAt(1, 4));
     });
   });
 });

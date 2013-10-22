@@ -13,23 +13,24 @@
 // limitations under the License.
 
 define(function() {
-  var Terrain = function(id, name, image, modifiers) {
+  var Terrain = function(id, name, image, isWet, modifiers) {
     this.id = id;
     this.name = name;
     this.image = image;
+    this.isWet = isWet;
     this.modifiers = modifiers;
   };
   
   // Deserializes a JSON terrain object into a Terrain instance.
   Terrain.deserialize = function(terrain) {
-    return new Terrain(terrain.id, terrain.name, terrain.image,
+    return new Terrain(terrain.id, terrain.name, terrain.image, terrain.isWet,
                        terrain.modifiers || []);
   };
   
   // Handy named terrain types.
-  Terrain.FIELD = new Terrain('.', 'Fields', 'terrain/field.png');
-  Terrain.FOREST = new Terrain('T', 'Forest', 'terrain/forest.png');
-  Terrain.SEA = new Terrain('~', 'Sea', 'terrain/sea.png');
+  Terrain.FIELD = new Terrain('.', 'Fields', 'terrain/field.png', false);
+  Terrain.FOREST = new Terrain('T', 'Forest', 'terrain/forest.png', false);
+  Terrain.SEA = new Terrain('~', 'Sea', 'terrain/sea.png', true);
   
   // Terrain types by their IDs
   Terrain.byId = {

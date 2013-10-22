@@ -164,10 +164,27 @@ define(function(require) {
       this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
 
       if (square) {
-        var image = this.images.get(square.terrain.image);
-        this.context.drawImage(image,
-                               offset.x - this.translation.x,
-                               offset.y - this.translation.y);
+		this.drawSquare(square, offset);
+      }
+    }
+  };
+  MapController.prototype.drawSquare = function(square, offset) {
+    var neighbors = this.scope.state.getNeighborsOfSquareAt(square.x, square.y, {});
+    
+    var image = this.images.get(square.terrain.image);
+    this.context.drawImage(image,
+                           offset.x - this.translation.x,
+                           offset.y - this.translation.y);
+                 
+    if (square.terrain.isWet) {
+      for (var dir in neighbors) {
+        if (neighbors[dir]) {
+          if (!neighbors[dir].terrain.isWet) {
+            var image = this.images.get('terrain/shore-' + dir + '.png');
+            this.context.drawImage(image, offset.x - this.translation.x,
+                                   offset.y - this.translation.y);
+          }
+        }
       }
     }
   };
@@ -222,5 +239,13 @@ define(function(require) {
     "terrain/field.png",
     "terrain/forest.png",
     "terrain/sea.png",
+    "terrain/shore-d.png",
+    "terrain/shore-dl.png",
+    "terrain/shore-dr.png",
+    "terrain/shore-l.png",
+    "terrain/shore-r.png",
+    "terrain/shore-u.png",
+    "terrain/shore-ul.png",
+    "terrain/shore-ur.png",
   ];
 });
