@@ -108,5 +108,11 @@ define(function(require) {
       element.trigger($.Event('mousemove', {offsetX: 70, offsetY: 0}));
       expect(scope.hoverSquare).to.deep.equal({x: 1, y: 1});
     });
+
+    it('calculates hover correctly, even under translation', function() {
+      mapController.translation.x = 70;
+      element.trigger($.Event('mousemove', {offsetX: 70, offsetY: 0}));
+      expect(scope.hoverSquare).to.deep.equal({x: 2, y: 2});
+    });
   });
 });

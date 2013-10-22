@@ -71,7 +71,9 @@ define(function(require) {
     this.container.on('mousemove', function(e) {
       // Publish the hover square coordinate on the $scope as hoverSquare
       $scope.$apply(function() {
-        CoordinateTransformer.pixelToIntMap(e.offsetX, e.offsetY, $scope.hoverSquare);
+        CoordinateTransformer.pixelToIntMap(e.offsetX + mapController.translation.x,
+                                            e.offsetY + mapController.translation.y,
+                                            $scope.hoverSquare);
       });
     });
 
