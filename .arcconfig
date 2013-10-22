@@ -2,8 +2,10 @@
   "project_id" : "Rise to Power",
   "conduit_uri" : "http://d.sil.as/",
   "load": [
-    ".arcanist/rtplinter"
+    ".arcanist/rtplinter",
+    ".arcanist/rtplisteners"
   ],
   "lint.engine": "RtpLintEngine",
-  "unit.engine": "RtpUnitTestEngine"
+  "unit.engine": "RtpUnitTestEngine",
+  "rtpci.uri": "rtpci.sil.as"
 }
