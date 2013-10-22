@@ -30,6 +30,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"code.google.com/p/rise-to-power/web/auth"
 )
 
 // NotFoundHandler is a simple Handler for not found resources.
@@ -44,6 +46,7 @@ type Handler struct {
 	codecs map[string]Codec
 	EndPoint
 	handles map[string]bool
+	Auth    *auth.Authenticator
 	// TODO(jwall): Support other http methods here.
 }
 
@@ -54,7 +57,7 @@ func (h *Handler) dispatch(hw HeaderWriter, r *http.Request, c Codec) (status in
 		// TODO(jwall): What to do about wrong methods.
 		return 404, h.NotFound(hw, r)
 	}
-	ctx := Context{CodecReader: CodecReader{r: r, c: c}, HeaderWriter: hw, Cookies: r.Cookies()}
+	ctx := Context{CodecReader: CodecReader{r: r, c: c}, HeaderWriter: hw, Cookies: r.Cookies(), Auth: h.Auth}
 	switch {
 	case r.Method == "POST":
 		return h.EndPoint.(Post).Post(ctx)
@@ -80,8 +83,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // New sets up an EndPoint as an http.Handler.
-func New(ep EndPoint) http.Handler {
-	h := &Handler{EndPoint: ep, handles: make(map[string]bool), codecs: map[string]Codec{"application/json": jsonCodec{}}}
+func New(ep EndPoint, auth *auth.Authenticator) http.Handler {
+	h := &Handler{EndPoint: ep, handles: make(map[string]bool), codecs: map[string]Codec{"application/json": jsonCodec{}}, Auth: auth}
 	_, ok := ep.(Post)
 	h.handles["POST"] = ok
 	_, ok = ep.(Get)
@@ -94,6 +97,7 @@ type Context struct {
 	HeaderWriter
 	CodecReader
 	Cookies []*http.Cookie
+	Auth    *auth.Authenticator
 }
 
 // Codec defines an interface for serializing and deserializing a rest payload.

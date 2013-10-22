@@ -66,10 +66,6 @@ func getSessionCookie(ctx rest.Context) *http.Cookie {
 			break
 		}
 	}
-	if cookie != nil {
-		cookie.Expires = time.Now()
-		ctx.Header().Add("Set-Cookie", cookie.String())
-	}
 	return cookie
 }
 
@@ -105,10 +101,10 @@ func (h *LoginHandler) Post(ctx rest.Context) (int, interface{}) {
 			return 409, nil
 		}
 	}
-	if ar.Username == "rtp-debug" && ar.Password == "rtp rules!" {
+	if ok, err := ctx.Auth.Authenticate(ar.Username, ar.Password); ok {
 		ctx.Header().Add("Set-Cookie", c.String())
 	} else {
-		log.Printf("Invalid user %q", ar.Username)
+		log.Printf("Unable to authenticate %q err %q", ar.Username, err)
 		status = 403
 	}
 	return status, nil
@@ -133,6 +129,7 @@ func (h *LogoutHandler) Get(ctx rest.Context) (int, interface{}) {
 			break
 		}
 	}
+	// If we saw a cookie then modify it's expiration.
 	if cookie != nil {
 		cookie.Expires = time.Now()
 		ctx.Header().Add("Set-Cookie", cookie.String())

@@ -21,6 +21,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"code.google.com/p/rise-to-power/web/auth"
 	"code.google.com/p/rise-to-power/web/rest"
 	"code.google.com/p/rise-to-power/web/session"
 )
@@ -51,10 +52,16 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	sessionStore := session.NewInMemoryStore()
+	auth := auth.New(auth.NewInMemoryStore())
+	// TODO(jwall): This is totally cheating and should be removed once
+	// we have real storage backends.
+	if err := auth.NewUser("rtp-debug", "rtp rules!"); err != nil {
+		log.Fatal(err)
+	}
 	muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
 	// TODO(jwall): handle codecs.
-	muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}))
-	muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}))
+	muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}, auth))
+	muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}, auth))
 	muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
 	// Note(jwall): to test this for now:
 	// curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
