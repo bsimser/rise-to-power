@@ -1,8 +1,11 @@
 <div class="fullscreen">
-	<map class="map" state="state" hover="hover"></map>
+	<map class="map" state="state" hover="hover" selected="selected"></map>
 	<div class="order-list">Order List</div>
 	<div class="detail-view">
 		Detail View:<br>
 		Hover: {{hover.x}}, {{hover.y}}
+		Selected:
+			<span ng-show="selected">{{selected.x}}, {{selected.y}}</span>
+			<span ng-hide="selected">No selection!</span>
 	</div>
 </div>

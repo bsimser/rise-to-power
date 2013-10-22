@@ -20,13 +20,16 @@ define(function(require) {
   var expect = chai.expect;
   var sinon = require('test/sinon');
   var angular = require('test/angular-mocks');
+  var FakeGameStateGenerator = require('rtp/fake-game-state-generator');
   require('rtp/directives/map');
   
   describe('map directive', function() {
-    var element;  
+    var element, scope;
     beforeEach(module('rtp'));
     beforeEach(inject(function($compile, $rootScope) {
-      var link = $compile('<map style="width: 100px; height: 400px"></map>');
+      scope = $rootScope;
+      scope.state = FakeGameStateGenerator();
+      var link = $compile('<map style="width: 100px; height: 400px" hover="hover" selected="selected" state="state"></map>');
       element = link($rootScope);
     }));
   
@@ -34,6 +37,16 @@ define(function(require) {
       var canvas = element.find('canvas');
       expect(canvas.prop('width')).to.equal(100);
       expect(canvas.prop('height')).to.equal(400);
+    });
+    
+    it('publishes the selected square on the parent scope', function() {
+      element.trigger($.Event('mousedown', {pageX: 0, pageY: 0}));
+      // Allow for a little slop in the mouseup because it's hard to stay on
+      // exactly the right pixel!
+      $(window).trigger($.Event('mouseup', {pageX: 1, pageY: 1}));
+      expect(scope.selected).to.be.defined;
+      expect(scope.selected.x).to.equal(0);
+      expect(scope.selected.y).to.equal(0);
     });
   });
   

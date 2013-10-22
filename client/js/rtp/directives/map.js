@@ -25,7 +25,8 @@ define(function(require) {
     return {
       scope: {
         state: '=',
-        hoverSquare: '=hover'
+        hoverSquare: '=hover',
+        selectedSquare: '=selected',
       },
       restrict: 'E',
       replace: true,
@@ -68,6 +69,7 @@ define(function(require) {
     DragHandler(this.container, this);
         
     this.scope.hoverSquare = new Point(0, 0);
+    this.scope.selectedSquare = null;
     this.container.on('mousemove', function(e) {
       // Publish the hover square coordinate on the $scope as hoverSquare
       $scope.$apply(function() {
@@ -80,15 +82,28 @@ define(function(require) {
     this.load();
   };
   MapController.prototype.mouseDown = function(e) {
-    this.startDragX = e.offsetX;
-    this.startDragY = e.offsetY;
+    this.startDragX = this.currentDragX = e.offsetX;
+    this.startDragY = this.currentDragY = e.offsetY;
   };
   MapController.prototype.mouseDrag = function(e) {
-    this.translation.x -= (e.offsetX - this.startDragX);
-    this.translation.y -= (e.offsetY - this.startDragY);
-    this.startDragX = e.offsetX;
-    this.startDragY = e.offsetY;
+    this.translation.x -= (e.offsetX - this.currentDragX);
+    this.translation.y -= (e.offsetY - this.currentDragY);
+    this.currentDragX = e.offsetX;
+    this.currentDragY = e.offsetY;
     this.redraw(true);
+  };
+  MapController.prototype.mouseUp = function(e) {
+    if (Math.abs(e.offsetX - this.startDragX) < 5 && 
+        Math.abs(e.offsetY - this.startDragY) < 5) {
+      // treat this as a selection click.
+      var lastClickSquare = this.coordinateTransformer.pixelToIntMap(
+          this.startDragX + this.translation.x, this.startDragY + this.translation.y,
+          new Point);
+      var scope = this.scope;
+      this.scope.$apply(function() {
+        scope.selectedSquare = scope.state.getSquareAt(lastClickSquare.x, lastClickSquare.y);
+      });
+    }
   };
   
   MapController.prototype.adjustCanvasSize = function() {
