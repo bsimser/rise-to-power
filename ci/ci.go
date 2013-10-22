@@ -65,9 +65,10 @@ type job struct {
 }
 
 type jobResult struct {
-	job
-	Status jobStatus
-	Extra  string
+	Type     jobType
+	Revision string
+	Status   jobStatus
+	Extra    string
 }
 
 // Functions that actually do the building.
