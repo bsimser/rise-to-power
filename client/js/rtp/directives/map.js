@@ -16,6 +16,8 @@ define(function(require) {
 	var rtp = require('rtp/ui-module');
   var Point = require('rtp/point');
   var LoadingBar = require('rtp/loading-bar');
+  var Square = require('rtp/square');
+  
   require('rtp/services/image-downloader');
   require('rtp/services/coordinate-transformer');
   require('rtp/services/resize-observer');
@@ -26,7 +28,8 @@ define(function(require) {
       scope: {
         state: '=',
         hoverSquare: '=hover',
-        selectedSquare: '=selected',
+        selectedSquare: '=outSelected',
+        requestedCenter: '=inCenterOn'
       },
       restrict: 'E',
       replace: true,
@@ -69,7 +72,6 @@ define(function(require) {
     DragHandler(this.container, this);
         
     this.scope.hoverSquare = new Point(0, 0);
-    this.scope.selectedSquare = null;
     this.container.on('mousemove', function(e) {
       // Publish the hover square coordinate on the $scope as hoverSquare
       $scope.$apply(function() {
@@ -78,6 +80,25 @@ define(function(require) {
                                             $scope.hoverSquare);
       });
     });
+    this.scope.$watch('requestedCenter', function(center) {
+      if (center) {
+        // check to see if this square is near enough the middle of the map.
+        var location = CoordinateTransformer.mapToPixel(center.x, center.y, new Point);
+        var x = location.x - mapController.translation.x;
+        var y = location.y - mapController.translation.y;
+        if (!(x > 100 && x <= mapController.width - 100 &&
+              y > 100 && y <= mapController.height - 100)) {
+          // We need to scroll. Calculate ideal translation:
+          mapController.translation.x = Math.floor(location.x - mapController.width / 2);
+          mapController.translation.y = Math.floor(location.y - mapController.height / 2);
+        }
+        $scope.selectedSquare = $scope.state.getSquareAt(center.x, center.y);
+        
+        mapController.redraw(true);
+      }
+    }, true);
+    
+    this.scope.selectedSquare = null;
 
     this.load();
   };
@@ -179,7 +200,7 @@ define(function(require) {
       this.coordinateTransformer.mapToImageOrigin(mapX, mapY, offset);
 
       if (square) {
-		this.drawSquare(square, offset);
+    		this.drawSquare(square, offset);
       }
     }
   };
