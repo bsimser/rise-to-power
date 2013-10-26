@@ -121,8 +121,10 @@ define(function(require) {
           this.startDragX + this.translation.x, this.startDragY + this.translation.y,
           new Point);
       var scope = this.scope;
+      var mapController = this;
       this.scope.$apply(function() {
         scope.selectedSquare = scope.state.getSquareAt(lastClickSquare.x, lastClickSquare.y);
+        mapController.redraw(true);
       });
     }
   };
@@ -203,6 +205,17 @@ define(function(require) {
     		this.drawSquare(square, offset);
       }
     }
+    
+    // Draw the highlight
+    if (this.scope.selectedSquare) {
+      this.coordinateTransformer.mapToImageOrigin(this.scope.selectedSquare.x,
+                                                  this.scope.selectedSquare.y,
+                                                  offset);
+                                                  
+      this.context.strokeStyle = 'yellow';
+      this.context.strokeRect(offset.x - this.translation.x - 1, offset.y - this.translation.y - 1,
+                              70 + 2, 48 + 2);
+    }
   };
   MapController.prototype.drawSquare = function(square, offset) {
     var neighbors = this.scope.state.getNeighborsOfSquareAt(square.x, square.y, {});
@@ -211,7 +224,8 @@ define(function(require) {
     this.context.drawImage(image,
                            offset.x - this.translation.x,
                            offset.y - this.translation.y);
-                 
+
+    // Draw beaches.
     if (square.terrain.isWet) {
       for (var dir in neighbors) {
         if (neighbors[dir]) {
