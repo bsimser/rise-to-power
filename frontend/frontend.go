@@ -21,6 +21,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"code.google.com/p/rise-to-power/backend/data/user"
 	"code.google.com/p/rise-to-power/web/auth"
 	"code.google.com/p/rise-to-power/web/rest"
 	"code.google.com/p/rise-to-power/web/session"
@@ -52,7 +53,7 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	sessionStore := session.NewInMemoryStore()
-	auth := auth.New(auth.NewInMemoryStore())
+	auth := auth.New(user.NewInMemoryStore())
 	// TODO(jwall): This is totally cheating and should be removed once
 	// we have real storage backends.
 	if err := auth.NewUser("rtp-debug", "rtp rules!"); err != nil {

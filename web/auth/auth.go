@@ -29,10 +29,10 @@ import (
 
 // Store defines the storage api for user information
 type Store interface {
-	// UpdateUser stores data for user.
-	UpdateUser(user string, pwd_hash []byte) error
-	// GetUser returns a user from the db or an error.
-	GetUser(user string) (*User, error)
+	// UpdatePass stores data for user.
+	UpdatePass(user string, pwd_hash []byte) error
+	// GetPass returns a user from the db or an error.
+	GetPass(user string) ([]byte, error)
 }
 
 type AuthError error
@@ -49,11 +49,6 @@ var (
 	// this error when the password is invalid.
 	InvalidPassErr = newAuthError(fmt.Errorf("Invalid Password"))
 )
-
-type User struct {
-	Name string
-	Hash []byte
-}
 
 type Authenticator struct {
 	cost int
@@ -80,7 +75,7 @@ func (store *Authenticator) UpdatePassword(user, oldPass, newPass string) error 
 		if err != nil {
 			return err
 		}
-		store.UpdateUser(user, h)
+		store.UpdatePass(user, h)
 		return nil
 	}
 	return InvalidPassErr
@@ -89,11 +84,11 @@ func (store *Authenticator) UpdatePassword(user, oldPass, newPass string) error 
 // Authenticate authenticates a user using bcrypt. It is expected that
 // the stored password hash was generated using bcrypt for storage.
 func (store *Authenticator) Authenticate(user, pass string) (bool, error) {
-	u, err := store.GetUser(user)
+	h, err := store.GetPass(user)
 	if err != nil {
 		return false, err
 	}
-	err = bcrypt.CompareHashAndPassword(u.Hash, []byte(pass))
+	err = bcrypt.CompareHashAndPassword(h, []byte(pass))
 	if err == nil {
 		return true, nil
 	}
@@ -110,7 +105,7 @@ func (store *Authenticator) NewUser(user, pass string) error {
 	if err != nil {
 		return err
 	}
-	return store.UpdateUser(user, h)
+	return store.UpdatePass(user, h)
 }
 
 // InMemoryStore returns an in memory implementation of an auth.Store
@@ -124,16 +119,16 @@ type inMemoryStore struct {
 	users map[string][]byte
 }
 
-func (fs inMemoryStore) GetUser(user string) (*User, error) {
+func (fs inMemoryStore) GetPass(user string) ([]byte, error) {
 	fs.RLock()
 	defer fs.RUnlock()
 	if h, ok := fs.users[user]; ok {
-		return &User{Name: user, Hash: h}, nil
+		return h, nil
 	}
 	return nil, NoSuchUserErr
 }
 
-func (fs inMemoryStore) UpdateUser(user string, pwd_hash []byte) error {
+func (fs inMemoryStore) UpdatePass(user string, pwd_hash []byte) error {
 	fs.Lock()
 	defer fs.Unlock()
 	fs.users[user] = pwd_hash
