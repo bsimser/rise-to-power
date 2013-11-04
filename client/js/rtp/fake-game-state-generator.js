@@ -16,6 +16,8 @@ define(function(require) {
   var Terrain = require('rtp/terrain');
   var Square = require('rtp/square');
   var GameState = require('rtp/game-state');
+  var Municipality = require('rtp/municipality');
+  var Player = require('rtp/player');
   
   function fade(t) {
     // Unrolled 5th degree polynomial
@@ -98,16 +100,28 @@ define(function(require) {
   
   return function() {
     var fakeSquares = [];
-    for (var j = -100; j <= 100; ++j) {
-      for (var i = -100; i <= 100; ++i) {
+    for (var j = -17*6; j < 17*6; ++j) {
+      for (var i = -17*6; i < 17*6; ++i) {
         var terrain = chooseTerrain(i, j);
         var fakeSquare = new Square(i + ',' + j, terrain, i, j, undefined, undefined, undefined);
         fakeSquares.push(fakeSquare);
       }
     }
     
+    var fakeMunicipalities = [];
+    for (var j = -17*6; j < 17*6; j += 17) {
+      for (var i = -17*6; i < 17*6; i += 17) {
+        var municipality = new Municipality(i + ',' + j, i, j, null, null, null);
+        fakeMunicipalities.push(municipality);
+      }
+    }
+    
+    var fakePlayers = ['applmak', 'jmegq', 'jwall', 'swsnider', 'dovenj'].map(function(name) {
+      return new Player(name, name, [], [], [], null, null, [], []);
+    })
+    
     console.log('Generated fake game state!');
     
-    return new GameState(fakeSquares);
+    return new GameState(fakeSquares, fakeMunicipalities, fakePlayers);
   };
 });

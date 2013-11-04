@@ -22,25 +22,55 @@ define(function(require) {
   var GameState = require('rtp/game-state');
   var Square = require('rtp/square');
   var Terrain = require('rtp/terrain');
+  var Player = require('rtp/player');
+  var Municipality = require('rtp/municipality');
   
   describe('GameState', function() {
-    var state;
-    beforeEach(function() {
-      state = new GameState([new Square('', Terrain.FIELD, 1, 3, undefined, undefined, undefined),
-                             new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)]);
+    describe('instance', function() {
+      var state;
+      beforeEach(function() {
+        state = new GameState([new Square('', Terrain.FIELD, 1, 3, undefined, undefined, undefined),
+                               new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)], [], []);
+      });
+      it('can return a square by location', function() {
+        var square = state.getSquareAt(1, 3);
+        expect(square).to.be.defined;
+        expect(square.x).to.equal(1);
+        expect(square.y).to.equal(3);      
+      });
+      it('returns undefined when asked about a square it doesn\'t know about', function() {
+        expect(state.getSquareAt(0, 0)).to.be.undefined;
+      });
+      it('can return neighbor squares', function() {
+        var neighbors = state.getNeighborsOfSquareAt(1, 3, {});
+        expect(neighbors.ur).to.equal(state.getSquareAt(1, 4));
+      });
     });
-    it('can return a square by location', function() {
-      var square = state.getSquareAt(1, 3);
-      expect(square).to.be.defined;
-      expect(square.x).to.equal(1);
-      expect(square.y).to.equal(3);      
-    });
-    it('returns undefined when asked about a square it doesn\'t know about', function() {
-      expect(state.getSquareAt(0, 0)).to.be.undefined;
-    });
-    it('can return neighbor squares', function() {
-      var neighbors = state.getNeighborsOfSquareAt(1, 3, {});
-      expect(neighbors.ur).to.equal(state.getSquareAt(1, 4));
+    
+    describe('deserialize', function() {
+      var state;
+      beforeEach(function() {
+        state = GameState.deserialize({
+          squares: [{id: '0,0', terrain: '.', x: 0, y: 0}],
+          municipalities: [{id: '0,0', x: 0, y: 0, owner: 'applmak'}, {id: '17,17', x: 17, y: 17, owner: 'jwall'}],
+          players: [{id: 'applmak', name: 'applmak', ownedLand: ['0,0'], liege: 'jwall'},
+                    {id: 'jwall', name: 'jwall', ownedLand: ['17,17'], vassals: ['applmak']}],
+        });
+      });
+      it('doesn\'t resolve anything yet', function() {
+        expect(state).to.be.an.instanceof(GameState);
+        expect(state.players[0]).to.be.an.instanceof(Player);
+        expect(state.players[0].liege).to.equal('jwall');
+        expect(state.municipalities[0]).to.be.an.instanceof(Municipality);
+        expect(state.municipalities[0].owner).to.equal('applmak');
+      });
+      it('resolves everything', function() {
+        state.finishDeserialize(null);
+        expect(state.players[0].liege).to.be.an.instanceof(Player);
+        expect(state.players[0].liege.name).to.equal('jwall');
+        expect(state.municipalities[0].owner).to.be.an.instanceof(Player);
+        expect(state.municipalities[0].owner.name).to.equal('applmak');
+      });
     });
   });
 });
