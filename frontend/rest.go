@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
@@ -141,4 +142,16 @@ func (h *LogoutHandler) Get(ctx rest.Context) (int, interface{}) {
 	// For now logouts always succeed. In future we may need to report
 	// failures.
 	return 200, nil
+}
+
+type BackendAddressHandler struct {
+	rest.NotFoundHandler
+}
+
+func (h *BackendAddressHandler) Get(ctx rest.Context) (int, interface{}) {
+	_, port, err := net.SplitHostPort(*addr)
+	if err != nil {
+		panic("Unable to parse given addr -- this should never happen! " + err.Error())
+	}
+	return 200, map[string]string{"server": fmt.Sprintf("127.0.0.1:%v", port)}
 }

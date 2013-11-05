@@ -63,6 +63,7 @@ func main() {
 	// TODO(jwall): handle codecs.
 	muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}, auth))
 	muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}, auth))
+	muxer.Handle("/_api/backendAddress", rest.New(&BackendAddressHandler{}, auth))
 	muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
 	// Note(jwall): to test this for now:
 	// curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
