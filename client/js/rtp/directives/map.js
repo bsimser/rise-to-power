@@ -206,6 +206,36 @@ define(function(require) {
       }
     }
     
+    // Draw owned municipality boundaries.
+    // TODO(applmak): This isn't exactly elegant.
+    var drawnMunicipalities = {};
+    var offset2 = new Point, offset3 = new Point, offset4 = new Point;
+    for (var i = 0; i < visibleSquares.length; i += 2) {
+      var mx = Math.floor(visibleSquares[i] / 17) * 17,
+          my = Math.floor(visibleSquares[i+1] / 17) * 17;
+      var key = mx + ',' + my;
+      if (drawnMunicipalities[key]) {
+        continue;
+      }
+      
+      var municipality = this.scope.state.getMunicipalityByKey(key) || {};
+
+      this.coordinateTransformer.mapToPixel(mx, my, offset);
+      this.coordinateTransformer.mapToPixel(mx + 17, my, offset2);
+      this.coordinateTransformer.mapToPixel(mx + 17, my + 17, offset3);
+      this.coordinateTransformer.mapToPixel(mx, my + 17, offset4);
+      
+      this.context.strokeStyle = municipality.owner ? 'orange' : '#333';
+      this.context.lineWidth = 1;
+      this.context.beginPath();
+      this.context.moveTo(offset.x - this.translation.x + 1, offset.y - this.translation.y);
+      this.context.lineTo(offset2.x - this.translation.x, offset2.y - this.translation.y - 1);
+      this.context.lineTo(offset3.x - this.translation.x - 1, offset3.y - this.translation.y);
+      this.context.lineTo(offset4.x - this.translation.x, offset4.y - this.translation.y + 1);
+      this.context.closePath();
+      this.context.stroke();
+    }
+    
     // Draw the highlight
     if (this.scope.selectedSquare) {
       this.coordinateTransformer.mapToImageOrigin(this.scope.selectedSquare.x,
