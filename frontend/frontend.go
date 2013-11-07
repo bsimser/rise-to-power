@@ -15,58 +15,58 @@
 package main
 
 import (
-  "flag"
-  "log"
-  "net/http"
+	"flag"
+	"log"
+	"net/http"
 
-  "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 
-  "code.google.com/p/rise-to-power/web/auth"
-  "code.google.com/p/rise-to-power/web/rest"
-  "code.google.com/p/rise-to-power/web/session"
+	"code.google.com/p/rise-to-power/web/auth"
+	"code.google.com/p/rise-to-power/web/rest"
+	"code.google.com/p/rise-to-power/web/session"
 )
 
 var (
-  addr      = flag.String("address", ":8080", "Address to bind to.")
-  staticDir = flag.String("static_dir", "client", "Root directory for static files.")
-  muxer     = mux.NewRouter()
+	addr      = flag.String("address", ":8080", "Address to bind to.")
+	staticDir = flag.String("static_dir", "client", "Root directory for static files.")
+	muxer     = mux.NewRouter()
 )
 
 type DefaultIndex struct {
-  dir http.Dir
+	dir http.Dir
 }
 
 func (d DefaultIndex) Open(name string) (http.File, error) {
-  log.Printf("Request: %v", name)
-  f, err := d.dir.Open(name)
-  if err != nil {
-    f, err = d.dir.Open("/index.html")
-  }
-  return f, err
+	log.Printf("Request: %v", name)
+	f, err := d.dir.Open(name)
+	if err != nil {
+		f, err = d.dir.Open("/index.html")
+	}
+	return f, err
 }
 
 func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
-  log.Fatalf("%v requested we quit.", r.RemoteAddr)
+	log.Fatalf("%v requested we quit.", r.RemoteAddr)
 }
 
 func main() {
-  flag.Parse()
-  sessionStore := session.NewInMemoryStore()
-  auth := auth.New(auth.NewInMemoryStore())
-  // TODO(jwall): This is totally cheating and should be removed once
-  // we have real storage backends.
-  if err := auth.NewUser("rtp-debug", "rtp rules!"); err != nil {
-    log.Fatal(err)
-  }
-  muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
-  // TODO(jwall): handle codecs.
-  muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}, auth))
-  muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}, auth))
-  muxer.Handle("/_api/backendAddress", rest.New(&BackendAddressHandler{}, auth))
-  muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
-  // Note(jwall): to test this for now:
-  // curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
-  http.Handle("/", muxer)
-  log.Printf("Server now listening on %v", *addr)
-  log.Fatal(http.ListenAndServe(*addr, nil))
+	flag.Parse()
+	sessionStore := session.NewInMemoryStore()
+	auth := auth.New(auth.NewInMemoryStore())
+	// TODO(jwall): This is totally cheating and should be removed once
+	// we have real storage backends.
+	if err := auth.NewUser("rtp-debug", "rtp rules!"); err != nil {
+		log.Fatal(err)
+	}
+	muxer.HandleFunc("/quitquitquit", quitQuitQuitHandler)
+	// TODO(jwall): handle codecs.
+	muxer.Handle("/_api/login", rest.New(&LoginHandler{ss: sessionStore}, auth))
+	muxer.Handle("/_api/logout", rest.New(&LogoutHandler{ss: sessionStore}, auth))
+	muxer.Handle("/_api/backendAddress", rest.New(&BackendAddressHandler{}, auth))
+	muxer.Handle("/{path:.*}", http.FileServer(DefaultIndex{dir: http.Dir(*staticDir)}))
+	// Note(jwall): to test this for now:
+	// curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
+	http.Handle("/", muxer)
+	log.Printf("Server now listening on %v", *addr)
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
