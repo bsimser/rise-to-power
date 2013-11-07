@@ -118,7 +118,20 @@ define(function(require) {
     
     var fakePlayers = ['applmak', 'jmegq', 'jwall', 'swsnider', 'dovenj'].map(function(name) {
       return new Player(name, name, [], [], [], null, null, [], []);
-    })
+    });
+    
+    // Each player needs to own SOME municipality.. choose it based on our
+    // random number generator.
+    fakePlayers.forEach(function(p) {
+      var x = (p.name.length + 0.1) * 0.145;
+      var y = (p.name.charCodeAt(0) + 0.11) * 0.143;
+      var z = 0.1;
+      var i = Math.floor(fakeMunicipalities.length * 0.5 * (1 + noise(x, y, z)));
+      while (i < fakeMunicipalities.length && fakeMunicipalities[i].owner) { i++; }
+      fakeMunicipalities[i].owner = p;
+      console.log(fakeMunicipalities[i].x, fakeMunicipalities[i].y, p.name);
+      p.ownedLand.push(fakeMunicipalities[i]);
+    });
     
     console.log('Generated fake game state!');
     

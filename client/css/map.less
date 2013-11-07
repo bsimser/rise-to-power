@@ -39,9 +39,41 @@
 }
 
 .detail-view {
+  @iconWidth: 64px;
+  @iconBorderWidth: 3px;
+  @iconSpacing: 4px;
+  
 	position: absolute;
 	height: @detailHeight;
 	bottom: 0;
 	left: 0;
 	right: @orderWidth;
+  
+  padding: 4px;
+  background-color: black;
+  
+  .icon {
+    display: block;
+    width: @iconWidth;
+    height: @iconWidth;
+    border: @iconBorderWidth solid #333;
+  }
+  
+  .info {
+    position: absolute;
+    left: @iconWidth + 2 * @iconBorderWidth + 2 * @iconSpacing;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    
+    a {
+      color: #DDD;
+      text-decoration: none;
+    }
+  }
+  
+  h3 {
+    color: white;
+    margin: 0;
+  }
 }

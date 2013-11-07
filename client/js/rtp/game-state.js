@@ -64,6 +64,10 @@ define(function(require) {
   GameState.prototype.getMunicipalityByKey = function(key) {
     return this.municipalitiesByKey[key];
   };
+  GameState.prototype.getMunicipalityAt = function(x, y) {
+    return this.getMunicipalityByKey((Math.floor(x / 17) * 17) + ',' + 
+                                     (Math.floor(y / 17) * 17));
+  };
   GameState.prototype.getPlayerByName = function(name) {
     return this.playersByName[name];
   };

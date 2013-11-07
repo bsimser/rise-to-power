@@ -30,7 +30,8 @@ define(function(require) {
       var state;
       beforeEach(function() {
         state = new GameState([new Square('', Terrain.FIELD, 1, 3, undefined, undefined, undefined),
-                               new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)], [], []);
+                               new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)],
+                              [new Municipality('0,0', 0, 0)], []);
       });
       it('can return a square by location', function() {
         var square = state.getSquareAt(1, 3);
@@ -44,6 +45,12 @@ define(function(require) {
       it('can return neighbor squares', function() {
         var neighbors = state.getNeighborsOfSquareAt(1, 3, {});
         expect(neighbors.ur).to.equal(state.getSquareAt(1, 4));
+      });
+      it('can return the municipality containing a location', function() {
+        var municipality = state.getMunicipalityAt(10, 5);
+        expect(municipality).to.be.instanceof(Municipality);
+        expect(municipality.x).to.equal(0);
+        expect(municipality.y).to.equal(0);
       });
     });
     
