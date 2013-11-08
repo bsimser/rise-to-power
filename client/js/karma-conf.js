@@ -19,8 +19,7 @@ module.exports = function(config) {
   config.set({
 
     // base path, that will be used to resolve files and exclude
-    basePath: '',
-
+    basePath: '..',
 
     // frameworks to use
     frameworks: ['mocha', 'requirejs'],
@@ -28,17 +27,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test/test-config.js',
-      {pattern: '**/*.js', included: false}
+      'js/test/test-config.js',
+      'js/angular.js',
+      {pattern: '**/*.js', included: false},
+      {pattern: 'partials/**/*.html', included: false}
     ],
-
 
     // list of files to exclude
     exclude: [
-      'rtp/main.js',
-      'rtp/config.js'
+      'js/rtp/main.js',
+      'js/rtp/config.js'
     ],
-
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
@@ -81,6 +80,10 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
+    singleRun: false,
+    
+    preprocessors: {
+      '**/*.html': ['ng-html2js']
+    }
   });
 };

@@ -135,6 +135,53 @@ define(function(require) {
     
     console.log('Generated fake game state!');
     
-    return new GameState(fakeSquares, fakeMunicipalities, fakePlayers);
+    function FakeGameState() {
+      GameState.apply(this, [].slice.call(arguments));
+    }
+    FakeGameState.prototype = Object.create(GameState.prototype);
+    FakeGameState.prototype.setSquareProperties = function(x, y, props) {
+      var id = x + ',' + y;
+      var square = this.getSquareAt(x, y);
+      props.id = id;
+      props.x = x;
+      props.y = y;
+      
+      if (square) {
+        // Existing square case:
+        if (props.terrain) {
+          square.terrain = props.terrain;
+        }
+      } else {
+        // New square case:
+        square = Square.deserialize(props);
+        this.squaresByLocation[id] = square;
+        this.squares.push(square);
+      }
+    };
+    FakeGameState.prototype.setMunicipalityProperties = function(x, y, props) {
+      var m = this.getMunicipalityAt(x, y);
+      if (m) {
+        x = m.x;
+        y = m.y;
+      }
+      var id = x + ',' + y;
+      props.id = id;
+      props.x = x;
+      props.y = y;
+      
+      if (m) {
+        // Existing municipality case:
+        if (props.owner) {
+          m.owner = props.owner instanceof Player ? props.owner : this.getPlayerByName(props.owner);
+        }
+      } else {
+        // New municipality case:
+        m = Municipality.deserialize(props);
+        this.municipalitiesByKey[id] = m;
+        this.municipalities.push(m);
+      }
+    };
+    
+    return new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers);
   };
 });

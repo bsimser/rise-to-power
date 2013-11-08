@@ -19,6 +19,7 @@ define(function(require) {
   require('rtp/controllers/map-page');
   require('rtp/controllers/login-page');
   require('rtp/directives/map');
+  require('rtp/directives/detail-view');
   
   rtp.config(function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);

@@ -23,12 +23,13 @@ for (var file in window.__karma__.files) {
 
 requirejs.config({
     // Karma serves files from '/base'
-    baseUrl: '/base',
+    baseUrl: '/base/js',
 
     paths: {
       jquery: 'jquery-2.0.3',
       less: 'less-1.4.1.min',
       'test/sinon': 'test/sinon-1.7.3',
+      partials: '../partials',
     },
 
     shim: {

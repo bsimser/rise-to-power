@@ -1,21 +1,5 @@
 <div class="fullscreen">
 	<map class="map" state="state" hover="hover" out-selected="selected" in-center-on="center"></map>
 	<div class="order-list">Order List</div>
-	<div class="detail-view">
-    <div ng-switch="getType(selected)" class="general-info">
-      <div ng-switch-when="Square">
-        <span class="icon">img here</span>
-        <div class="info">
-          <h3>{{selected.terrain.name}} @ {{selected.x}}, {{selected.y}}</h3>
-          <a href="#">{{getOwner(selected).name || 'Unowned'}}</a>
-        </div>
-      </div>
-      <div ng-switch-default>
-        <span class="icon">img here</span>
-        <div class="info">
-          <h3>No selection!</h3>
-        </div>
-      </div>
-    </div>
-	</div>
+  <detail-view class="detail-view"></detail-view>
 </div>
