@@ -295,7 +295,6 @@ type RejectAppointmentOrder struct {
 
 ```go
 type Terrain struct {
-  Id        string
   Name      string // UI name of this terrain
   Image     string // path to the image file for this terrain
   Modifiers []*Modifier // Modifiers that are invoked on units or buildings that are on squares of this kind of terrain.
