@@ -29,6 +29,8 @@ import (
 var (
 	addr      = flag.String("address", ":8080", "Address to bind to.")
 	staticDir = flag.String("static_dir", "client", "Root directory for static files.")
+	etcdAddr  = flag.String("etcd_addr", ":4001", "Address of one of the etcd servers.")
+	useEtcd   = flag.Bool("use_etcd", false, "If set, etcd is used.")
 	muxer     = mux.NewRouter()
 )
 
@@ -51,7 +53,12 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
-	sessionStore := session.NewInMemoryStore()
+	var sessionStore session.Store
+	if *useEtcd {
+		sessionStore = session.NewEtcdStore(*etcdAddr)
+	} else {
+		sessionStore = session.NewInMemoryStore()
+	}
 	auth := auth.New(auth.NewInMemoryStore())
 	// TODO(jwall): This is totally cheating and should be removed once
 	// we have real storage backends.
