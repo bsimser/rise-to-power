@@ -30,7 +30,7 @@ import (
 var (
 	addr      = flag.String("address", ":8080", "Address to bind to.")
 	staticDir = flag.String("static_dir", "client", "Root directory for static files.")
-	etcdAddr  = flag.String("etcd_addr", ":4001", "Address of one of the etcd servers.")
+	etcdAddr  = flag.String("etcd_addr", "127.0.0.1:4001", "Address of one of the etcd servers.")
 	useEtcd   = flag.Bool("use_etcd", false, "If set, etcd is used.")
 	muxer     = mux.NewRouter()
 )

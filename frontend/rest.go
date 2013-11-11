@@ -25,11 +25,14 @@ import (
 
 	"code.google.com/p/rise-to-power/web/rest"
 	"code.google.com/p/rise-to-power/web/session"
+
+	"github.com/coreos/go-etcd/etcd"
 )
 
 const (
-	usernameKey = "username"
-	passwordKey = "password"
+	usernameKey    = "username"
+	passwordKey    = "password"
+	backendListKey = "backends"
 )
 
 // AuthRequest defines a user authorization request
@@ -148,10 +151,29 @@ type BackendAddressHandler struct {
 	rest.NotFoundHandler
 }
 
-func (h *BackendAddressHandler) Get(ctx rest.Context) (int, interface{}) {
+func fallbackBackend() (int, interface{}) {
 	_, port, err := net.SplitHostPort(*addr)
 	if err != nil {
 		panic("Unable to parse given addr -- this should never happen! " + err.Error())
 	}
 	return 200, map[string]string{"server": fmt.Sprintf("127.0.0.1:%v", port)}
+}
+
+func (h *BackendAddressHandler) Get(ctx rest.Context) (int, interface{}) {
+	if *useEtcd {
+		client := etcd.NewClient([]string{*etcdAddr})
+		res, err := client.Get(backendListKey)
+		if err != nil {
+			log.Printf("Error getting backend list: %v", err)
+			return fallbackBackend()
+		}
+		if len(res) == 0 {
+			log.Print("Backend list response returned no results. Fallback engaged.")
+			return fallbackBackend()
+		}
+		// TODO(swsnider): retrieve backends via a map of shard to backend, rather
+		//                 than just the first one in the list.
+		return 200, map[string]string{"server": res[0].Value}
+	}
+	return fallbackBackend()
 }

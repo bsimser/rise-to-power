@@ -1,0 +1,16 @@
+#!/bin/bash
+trap "kill 0" SIGINT SIGTERM EXIT
+if [ `basename $PWD` != "rise-to-power" ]; then
+  echo "You must run this script from the rise-to-power directory."
+  exit 1
+fi
+if [ ! -f ".etcd/etcd" ]; then
+  rm -fr .etcd
+  git clone https://github.com/coreos/etcd .etcd
+  pushd .etcd
+  ./build
+  popd
+fi
+go get ./...
+.etcd/etcd -d .node0 -n node0&
+../../../../bin/frontend --use_etcd

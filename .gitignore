@@ -5,3 +5,5 @@
 .Trashes
 frontend/frontend
 *.test
+.etcd
+.node0

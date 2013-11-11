@@ -111,7 +111,7 @@ type jsonCodec struct{}
 
 func (c jsonCodec) Serialize(w http.ResponseWriter, i interface{}) error {
 	e := json.NewEncoder(w)
-	return e.Encode(w)
+	return e.Encode(i)
 }
 
 func (c jsonCodec) Deserialize(r *http.Request, i interface{}) error {
