@@ -75,11 +75,15 @@ func (fs inMemoryStore) GetPass(user string) ([]byte, error) {
 func (fs inMemoryStore) UpdatePass(user string, pwd_hash []byte) error {
 	fs.Lock()
 	defer fs.Unlock()
-	if u, err := fs.Get(user); err != nil {
+	if u, err := fs.get(user); err == nil {
 		u.Hash = pwd_hash
 		return fs.save(u)
 	}
-	return auth.NoSuchUserErr
+	u := &User{
+		Hash: pwd_hash,
+		Name: user,
+	}
+	return fs.save(u)
 }
 
 func (fs inMemoryStore) Save(user *User) error {
