@@ -162,18 +162,14 @@ func fallbackBackend() (int, interface{}) {
 func (h *BackendAddressHandler) Get(ctx rest.Context) (int, interface{}) {
 	if *useEtcd {
 		client := etcd.NewClient([]string{*etcdAddr})
-		res, err := client.Get(backendListKey)
+		res, err := client.Get(backendListKey, false)
 		if err != nil {
 			log.Printf("Error getting backend list: %v", err)
 			return fallbackBackend()
 		}
-		if len(res) == 0 {
-			log.Print("Backend list response returned no results. Fallback engaged.")
-			return fallbackBackend()
-		}
 		// TODO(swsnider): retrieve backends via a map of shard to backend, rather
 		//                 than just the first one in the list.
-		return 200, map[string]string{"server": res[0].Value}
+		return 200, map[string]string{"server": res.Value}
 	}
 	return fallbackBackend()
 }

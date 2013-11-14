@@ -17,7 +17,6 @@ package session
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/coreos/go-etcd/etcd"
 )
@@ -35,18 +34,12 @@ func NewEtcdStore(etcdAddr string) Store {
 }
 
 func (s *etcdSessionStore) Get(name string) (*Session, error) {
-	values, err := s.client.Get(fmt.Sprintf(etcdFormatStr, name))
+	resp, err := s.client.Get(fmt.Sprintf(etcdFormatStr, name), false)
 	if err != nil {
 		return nil, err
 	}
-	if len(values) == 0 {
-		return nil, NoSuchSession
-	}
-	if len(values) > 0 {
-		log.Printf("%v sessions found for key %v", len(values), name)
-	}
 	session := new(Session)
-	err = json.Unmarshal([]byte(values[0].Value), session)
+	err = json.Unmarshal([]byte(resp.Value), session)
 	if err != nil {
 		return nil, err
 	}
