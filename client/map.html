@@ -1,4 +1,13 @@
 <div class="fullscreen">
+  <div class="status-bar">
+    applmak
+    <button>Strategic</button>
+    <button>Relations</button>
+    Resources:
+    <span ng-repeat="resource in allResources">
+      <img src="{{resource.platonic.image}}" width="16px">{{resource.quantity}}
+    </span>
+  </div>
 	<map class="map" state="state" hover="hover" out-selected="selected" in-center-on="center"></map>
 	<div class="order-list">Order List</div>
   <detail-view class="detail-view"></detail-view>
