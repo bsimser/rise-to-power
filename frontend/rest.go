@@ -89,6 +89,7 @@ func (h *LoginHandler) Post(ctx rest.Context) (int, interface{}) {
 		if err != nil {
 			panic("Can't create user session. Something is very wrong!!!" + err.Error())
 		}
+		sess.Values[usernameKey] = ar.Username
 		err = h.ss.Save(sess)
 		if err != nil {
 			panic("Can't save user session. Something is very wrong!!!" + err.Error())
