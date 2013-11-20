@@ -23,13 +23,15 @@
 // 2. We need to be able to set headers.
 // 3. We need to be able Dispatch for the http Methods we support.
 // 4. We need the framework to take care of serialization based on the
-//    content type.
+//    accept header.
 package rest
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"bitbucket.org/ww/goautoneg"
 
 	"code.google.com/p/rise-to-power/web/auth"
 )
@@ -71,15 +73,22 @@ func (h *Handler) dispatch(hw HeaderWriter, r *http.Request, c Codec) (status in
 // ServeHTTP implements the http.Handler interface for a Handler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	if c, ok := h.codecs[r.Header.Get("Content-Type")]; ok {
-		status, result := h.dispatch(w, r, c)
-		w.WriteHeader(status)
-		c.Serialize(w, result)
-	} else {
-		// 406 Not acceptable
-		log.Printf("Invalid content type specified")
-		w.WriteHeader(406)
+
+	alts := make([]string, 0, len(h.codecs))
+	for k := range h.codecs {
+		alts = append(alts, k)
 	}
+	selected := goautoneg.Negotiate(r.Header.Get("Accept"), alts)
+
+	c, ok := h.codecs[selected]
+	if !ok {
+		log.Printf("Unable to look up codec for %v. Available codecs are: %v", selected, alts)
+		w.WriteHeader(406)
+		return
+	}
+	status, result := h.dispatch(w, r, c)
+	w.WriteHeader(status)
+	c.Serialize(w, result)
 }
 
 // New sets up an EndPoint as an http.Handler.
