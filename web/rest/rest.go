@@ -28,10 +28,10 @@ package rest
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"bitbucket.org/ww/goautoneg"
+	log "github.com/swsnider/glog"
 
 	"code.google.com/p/rise-to-power/web/auth"
 )
@@ -82,7 +82,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	c, ok := h.codecs[selected]
 	if !ok {
-		log.Printf("Unable to look up codec for %v. Available codecs are: %v", selected, alts)
+		log.Errorf("Unable to look up codec for %v. Available codecs are: %v", selected, alts)
 		w.WriteHeader(406)
 		return
 	}

@@ -16,10 +16,10 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	log "github.com/swsnider/glog"
 
 	"code.google.com/p/rise-to-power/web/auth"
 	"code.google.com/p/rise-to-power/web/rest"
@@ -39,7 +39,7 @@ type DefaultIndex struct {
 }
 
 func (d DefaultIndex) Open(name string) (http.File, error) {
-	log.Printf("Request: %v", name)
+	log.Infof("Request: %v", name)
 	f, err := d.dir.Open(name)
 	if err != nil {
 		f, err = d.dir.Open("/index.html")
@@ -52,7 +52,9 @@ func quitQuitQuitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	defer log.Flush()
 	flag.Parse()
+	log.StartLogging()
 	var sessionStore session.Store
 	if *useEtcd {
 		sessionStore = session.NewEtcdStore(*etcdAddr)
@@ -74,6 +76,6 @@ func main() {
 	// Note(jwall): to test this for now:
 	// curl -v -H 'Content-Type: application/json' --data '{"Username":"rtp-debug","Password":"rtp rules!"}' http://localhost:8080/_api/login
 	http.Handle("/", muxer)
-	log.Printf("Server now listening on %v", *addr)
+	log.Infof("Server now listening on %v", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

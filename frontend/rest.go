@@ -18,15 +18,15 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"time"
 
+	"github.com/coreos/go-etcd/etcd"
+	log "github.com/swsnider/glog"
+
 	"code.google.com/p/rise-to-power/web/rest"
 	"code.google.com/p/rise-to-power/web/session"
-
-	"github.com/coreos/go-etcd/etcd"
 )
 
 const (
@@ -74,7 +74,7 @@ func getSessionCookie(ctx rest.Context) *http.Cookie {
 }
 
 func (h *LoginHandler) Post(ctx rest.Context) (int, interface{}) {
-	log.Printf("Handling login request %q")
+	log.Infof("Handling login request %q")
 	ar := AuthRequest{}
 	ctx.Deserialize(&ar)
 	status := 200
@@ -109,7 +109,7 @@ func (h *LoginHandler) Post(ctx rest.Context) (int, interface{}) {
 	if ok, err := ctx.Auth.Authenticate(ar.Username, ar.Password); ok {
 		ctx.Header().Add("Set-Cookie", c.String())
 	} else {
-		log.Printf("Unable to authenticate %q err %q", ar.Username, err)
+		log.Errorf("Unable to authenticate %q err %q", ar.Username, err)
 		status = 403
 	}
 	return status, nil
@@ -165,7 +165,7 @@ func (h *BackendAddressHandler) Get(ctx rest.Context) (int, interface{}) {
 		client := etcd.NewClient([]string{*etcdAddr})
 		res, err := client.Get(backendListKey, false)
 		if err != nil {
-			log.Printf("Error getting backend list: %v", err)
+			log.Errorf("Error getting backend list: %v", err)
 			return fallbackBackend()
 		}
 		// TODO(swsnider): retrieve backends via a map of shard to backend, rather

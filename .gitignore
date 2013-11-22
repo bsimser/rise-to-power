@@ -6,4 +6,5 @@
 frontend/frontend
 *.test
 .etcd
-.node0
+.node*
+.logs
