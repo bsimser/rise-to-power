@@ -17,8 +17,18 @@ define(function(require) {
   var GameState = require('rtp/game-state');
   var FakeGameStateGenerator = require('rtp/fake-game-state-generator');
   
-  rtp.controller('MapPageController', function($scope, $timeout) {
+  rtp.controller('MapPageController', function($scope, $timeout, $location, $http) {
     console.log('MapPageController inited');
+    
+    $http.get('/_api/backendAddress').then(function(result) {
+      console.log('backend address:', result.data);
+      // TODO(applmak): When backend starts talkin' websockets, create the 
+      // jsonrpc client here, and stick it somewhere.
+    }, function(error) {
+      console.error('backend error:', error);
+      $location.path('/login');
+    });
+    
     // TODO(applmak): Once the server supports it, here's a good place to read
     // the entire game state. For the moment, we'll fake it.
     var state = FakeGameStateGenerator();
