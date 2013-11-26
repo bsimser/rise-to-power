@@ -44,6 +44,14 @@ define(function(require) {
         return m.owner;
       }
     };
+    
+    // Returns an image to display for the selected thing.
+    $scope.getImage = function(selectedThing) {
+      if (selectedThing) {
+        // Square!
+        return 'images/' + selectedThing.terrain.image;
+      }
+    };
   };
   
   rtp.controller('DetailViewController', DetailViewController);

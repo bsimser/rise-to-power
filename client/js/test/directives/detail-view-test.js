@@ -59,5 +59,14 @@ define(function(require) {
       var info = $(element).find('.info');
       expect(info.text()).to.contain('applmak');
     });
+    
+    it('displays the image associated with the selection', function() {
+      scope.$apply(function() {
+        scope.selected = scope.state.getSquareAt(5, 17);
+      });
+      
+      var info = $(element).find('img.icon');
+      expect(info.attr('src')).to.equal('images/terrain/field.png');
+    });
   });
 });
