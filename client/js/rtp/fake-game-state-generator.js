@@ -18,6 +18,8 @@ define(function(require) {
   var GameState = require('rtp/game-state');
   var Municipality = require('rtp/municipality');
   var Player = require('rtp/player');
+  var Unit = require('rtp/unit');
+  var testRules = require('rtp/test-rules');
   
   function fade(t) {
     // Unrolled 5th degree polynomial
@@ -133,6 +135,18 @@ define(function(require) {
       p.ownedLand.push(fakeMunicipalities[i]);
     });
     
+    var fakeUnits = fakePlayers.map(function(player) {
+      // make a unit for each player... on a random square in his municipality.
+      var m = player.ownedLand[0];
+      var x = Math.floor(Math.random() * 17) + m.x;
+      var y = Math.floor(Math.random() * 17) + m.y;
+      
+      return new Unit('fjsl', testRules.getUnitBlueprintById('dude'), player, x + ',' + y, 10, null);
+    });
+    
+    var fakeBuildings = [];
+    // TODO(applmak): Make some fake buildings!
+    
     console.log('Generated fake game state!');
     
     function FakeGameState() {
@@ -182,6 +196,6 @@ define(function(require) {
       }
     };
     
-    return new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers);
+    return new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers, fakeUnits, fakeBuildings);
   };
 });

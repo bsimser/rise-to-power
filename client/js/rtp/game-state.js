@@ -16,7 +16,9 @@ define(function(require) {
   var Square = require('rtp/square');
   var Municipality = require('rtp/municipality');
   var Player = require('rtp/player');
-
+  var Unit = require('rtp/unit');
+  var Building = require('rtp/building');
+  
   var OFFSETS = {
     'u': {x: -1, y: 1},
     'ur': {x: 0, y: 1},
@@ -28,10 +30,12 @@ define(function(require) {
     'ul': {x: -1, y: 0},
   };
   
-  var GameState = function(squares, municipalities, players) {
+  var GameState = function(squares, municipalities, players, units, buildings) {
     this.squares = squares;
     this.municipalities = municipalities;
     this.players = players;
+    this.units = units;
+    this.buildings = buildings;
     
     // build a handy-dandy map of x,y location to square to save time.
     this.squaresByLocation = {};
@@ -48,6 +52,22 @@ define(function(require) {
     this.players.forEach(function(p) {
       this.playersByName[p.name] = p;
     }, this);
+    // build a multimap of location -> unit.
+    this.unitsByLocation = {};
+    this.units.forEach(function(u) {
+      var key = u.location.x + ',' + u.location.y;
+      (this.unitsByLocation[key] = this.unitsByLocation[key] || []).push(u);
+    }, this);
+    
+    // build a map of location -> building.
+    this.buildingsByLocation = {};
+    this.buildings.forEach(function(b) {
+      var key = b.location.x + ',' + b.location.y;
+      this.buildingsByLocation[key] = b;
+    }, this);
+  };
+  GameState.prototype.getSquareByKey = function(key) {
+    return this.squaresByLocation[key];
   };
   GameState.prototype.getSquareAt = function(x, y) {
     return this.squaresByLocation[x + ',' + y];
@@ -71,13 +91,21 @@ define(function(require) {
   GameState.prototype.getPlayerByName = function(name) {
     return this.playersByName[name];
   };
+  GameState.prototype.getUnitsAt = function(x, y) {
+    return this.unitsByLocation[x + ',' + y] || [];
+  };
+  GameState.prototype.getBuildingAt = function(x, y) {
+    return this.buildingsByLocation[x + ',' + y];
+  };
   
   // Deserializes an entire game state into a GameState instance.
   GameState.deserialize = function(s) {
     return new GameState(
       s.squares.map(Square.deserialize),
       s.municipalities.map(Municipality.deserialize),
-      s.players.map(Player.deserialize)
+      s.players.map(Player.deserialize),
+      s.units.map(Unit.deserialize),
+      s.buildings.map(Building.deserialize)
     );
   };
   
@@ -85,13 +113,19 @@ define(function(require) {
   // TODO(applmak): In the future, if we ever support sending down only the
   // changed GameState to clients, this method may use its GameState to
   // apply itself to as well.
-  GameState.prototype.finishDeserialize = function(state) {
+  GameState.prototype.finishDeserialize = function(state, rules) {
     // Call the relevant finish methods.
     this.municipalities.forEach(function(m) {
       m.finishDeserialize(this);
     }, this);
     this.players.forEach(function(p) {
       p.finishDeserialize(this);
+    }, this);
+    this.units.forEach(function(u) {
+      u.finishDeserialize(this, rules);
+    }, this);
+    this.buildings.forEach(function(b) {
+      b.finishDeserialize(this, rules);
     }, this);
   };
   

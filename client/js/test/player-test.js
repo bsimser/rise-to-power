@@ -20,6 +20,7 @@ define(function(require) {
   var expect = chai.expect;
   var sinon = require('test/sinon');
   var GameState = require('rtp/game-state');
+  var Unit = require('rtp/unit');
   var Player = require('rtp/player');
   var Municipality = require('rtp/municipality');
   
@@ -46,7 +47,7 @@ define(function(require) {
           new Player('swsnider', 'swsnider'),
           new Player('george', 'george'),
           new Player('dude', 'dude'),
-        ]);
+        ], [], []);
         player.finishDeserialize(state);
         
         expect(player.liege).to.be.null;
