@@ -16,7 +16,7 @@ define(function(require) {
   var Rules = require('rtp/rules');
   
   var r = Rules.deserialize({
-    unitBlueprints: [{id: 'dude', name: 'Dude', image: 'dude.png', maxPower: 50, movement: 3, modifiers: []}],
+    unitBlueprints: [{id: 'dude', name: 'Dude', image: 'units/dude.png', maxPower: 50, movement: 3, modifiers: []}],
     resourceBlueprints: [{id: 'iron', name: 'Iron', image: 'iron.png'},
                          {id: 'lumber', name: 'Lumber', image: 'lumber.png'},
                          {id: 'coal', name: 'Coal', image: 'coal.png'}],

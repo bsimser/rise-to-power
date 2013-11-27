@@ -55,15 +55,15 @@ define(function(require) {
     // build a multimap of location -> unit.
     this.unitsByLocation = {};
     this.units.forEach(function(u) {
-      var key = u.location.x + ',' + u.location.y;
-      (this.unitsByLocation[key] = this.unitsByLocation[key] || []).push(u);
+      // Note that these units are half-deserialized units, with no points to
+      // other data objects.
+      (this.unitsByLocation[u.location] = this.unitsByLocation[u.location] || []).push(u);
     }, this);
     
     // build a map of location -> building.
     this.buildingsByLocation = {};
     this.buildings.forEach(function(b) {
-      var key = b.location.x + ',' + b.location.y;
-      this.buildingsByLocation[key] = b;
+      this.buildingsByLocation[b.location] = b;
     }, this);
   };
   GameState.prototype.getSquareByKey = function(key) {

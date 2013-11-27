@@ -39,8 +39,8 @@ define(function(require) {
                                new Square('', Terrain.FIELD, 1, 4, undefined, undefined, undefined)],
                               [new Municipality('0,0', 0, 0)],
                               [new Player('joe', 'joe')],
-                              [new Unit('dude', 'dude', 'joe', {x: 1, y: 4})],
-                              [new Building('myfarm', 'farm', {x: 1, y: 3}, [], [new ResourceQuantity(100, 'lumber')])]);
+                              [new Unit('dude', 'dude', 'joe', '1,4')],
+                              [new Building('myfarm', 'farm', '1,3', [], [new ResourceQuantity(100, 'lumber')])]);
       });
       it('can return a square by key', function() {
         var square = state.getSquareByKey('1,3');

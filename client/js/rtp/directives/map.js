@@ -28,7 +28,7 @@ define(function(require) {
       scope: {
         state: '=',
         hoverSquare: '=hover',
-        selectedSquare: '=outSelected',
+        selected: '=outSelected',
         requestedCenter: '=inCenterOn'
       },
       restrict: 'E',
@@ -92,13 +92,13 @@ define(function(require) {
           mapController.translation.x = Math.floor(location.x - mapController.width / 2);
           mapController.translation.y = Math.floor(location.y - mapController.height / 2);
         }
-        $scope.selectedSquare = $scope.state.getSquareAt(center.x, center.y);
+        $scope.selected = $scope.state.getSquareAt(center.x, center.y);
         
         mapController.redraw(true);
       }
     }, true);
     
-    this.scope.selectedSquare = null;
+    this.scope.selected = null;
 
     this.load();
   };
@@ -123,7 +123,7 @@ define(function(require) {
       var scope = this.scope;
       var mapController = this;
       this.scope.$apply(function() {
-        scope.selectedSquare = scope.state.getSquareAt(lastClickSquare.x, lastClickSquare.y);
+        scope.selected = scope.state.getSquareAt(lastClickSquare.x, lastClickSquare.y);
         mapController.redraw(true);
       });
     }
@@ -236,10 +236,25 @@ define(function(require) {
       this.context.stroke();
     }
     
+    // On top of the most everything and the borders, but beneath the 
+    // highlight, draw the units.
+    for (var i = 0; i < visibleSquares.length; i += 2) {
+      var x = visibleSquares[i],
+          y = visibleSquares[i+1]; //1 5 9 16 19 24
+      var units = this.scope.state.getUnitsAt(x, y);
+      // TODO(applmak): These will need to be sorted.
+      this.coordinateTransformer.mapToImageOrigin(x, y, offset);
+      units.forEach(function(unit) {
+        var image = this.images.get(unit.type.image);
+        this.context.drawImage(image, offset.x - this.translation.x,
+                               offset.y - this.translation.y);
+      }, this);
+    }
+    
     // Draw the highlight
-    if (this.scope.selectedSquare) {
-      this.coordinateTransformer.mapToImageOrigin(this.scope.selectedSquare.x,
-                                                  this.scope.selectedSquare.y,
+    if (this.scope.selected) {
+      this.coordinateTransformer.mapToImageOrigin(this.scope.selected.x,
+                                                  this.scope.selected.y,
                                                   offset);
                                                   
       this.context.strokeStyle = 'yellow';
@@ -327,5 +342,6 @@ define(function(require) {
     "terrain/shore-u.png",
     "terrain/shore-ul.png",
     "terrain/shore-ur.png",
+    "units/dude.png",
   ];
 });

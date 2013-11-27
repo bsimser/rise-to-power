@@ -60,6 +60,16 @@ define(function(require) {
       expect(info.text()).to.contain('applmak');
     });
     
+    it('displays the currently selected unit', function() {
+      scope.$apply(function() {
+        var unit = scope.state.units[0];
+        scope.selected = scope.state.getSquareAt(unit.location.x, unit.location.y);
+      });
+      
+      var info = $(element).find('.info');
+      expect(info.text()).to.contain('1 Unit');
+    });
+    
     it('displays the image associated with the selection', function() {
       scope.$apply(function() {
         scope.selected = scope.state.getSquareAt(5, 17);

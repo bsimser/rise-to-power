@@ -130,18 +130,20 @@ define(function(require) {
       var z = 0.1;
       var i = Math.floor(fakeMunicipalities.length * 0.5 * (1 + noise(x, y, z)));
       while (i < fakeMunicipalities.length && fakeMunicipalities[i].owner) { i++; }
-      fakeMunicipalities[i].owner = p;
+      fakeMunicipalities[i].owner = p.name;
       console.log(fakeMunicipalities[i].x, fakeMunicipalities[i].y, p.name);
-      p.ownedLand.push(fakeMunicipalities[i]);
+      p.ownedLand.push(fakeMunicipalities[i].x + ',' + fakeMunicipalities[i].y);
     });
     
     var fakeUnits = fakePlayers.map(function(player) {
       // make a unit for each player... on a random square in his municipality.
-      var m = player.ownedLand[0];
-      var x = Math.floor(Math.random() * 17) + m.x;
-      var y = Math.floor(Math.random() * 17) + m.y;
+      var m = player.ownedLand[0].split(',');
+      var x = Math.floor(Math.random() * 17) + parseInt(m[0]);
+      var y = Math.floor(Math.random() * 17) + parseInt(m[1]);
       
-      return new Unit('fjsl', testRules.getUnitBlueprintById('dude'), player, x + ',' + y, 10, null);
+      console.log(player.name, 'dude', x, y);
+      
+      return new Unit('fjsl', 'dude', player.name, x + ',' + y, 10, null);
     });
     
     var fakeBuildings = [];
@@ -196,6 +198,8 @@ define(function(require) {
       }
     };
     
-    return new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers, fakeUnits, fakeBuildings);
+    var state = new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers, fakeUnits, fakeBuildings);
+    state.finishDeserialize(null, testRules);
+    return state;
   };
 });

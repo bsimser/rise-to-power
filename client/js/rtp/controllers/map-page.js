@@ -35,23 +35,5 @@ define(function(require) {
     $timeout(function() {
       $scope.state = state;
     }, 2000);
-    
-    // Returns the type of the given object as a string.
-    // TODO(applmak): There are elegant ways of doing this. Use one of them.
-    $scope.getType = function(selectedThing) {
-      if (selectedThing) {
-        return "Square";
-      }
-      return "undefined";
-    };
-    
-    // Returns the owner of a thing or undefined if there is no owner.
-    // @return {Player} the owning player.
-    $scope.getOwner = function(selectedThing) {
-      if (selectedThing) {
-        var m = $scope.state.getMunicipalityAt(selectedThing.x, selectedThing.y);
-        return m.owner;
-      }
-    };
   });
 });

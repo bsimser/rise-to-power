@@ -1,16 +1,20 @@
 <div>
-  <div ng-switch="getType(selected)" class="general-info">
-    <div ng-switch-when="Square">
-      <img class="icon" src="{{getImage(selected)}}">
-      <div class="info">
-        <h3>{{selected.terrain.name}} @ {{selected.x}}, {{selected.y}}</h3>
-        <a href="#">{{getOwner(selected).name || 'Unowned'}}</a>
-      </div>
-    </div>
-    <div ng-switch-default>
-      <span class="icon"></span>
-      <div class="info">
+  <div class="general-info">
+    <div ng-init="detail.selection = 'Nothing'" ng-switch="detail.selection">
+      <div ng-switch-when="Nothing" class="info">
+  	    <span class="icon"></span>
         <h3>No selection!</h3>
+      </div>
+	    <img ng-switch-when="Units" src="images/{{selectedUnits[0].type.image}}" class="icon">
+      <div ng-switch-when="Units" class="info">
+        <h3>{{selectedUnits.length}} Units @ {{selectedSquare.x}}, {{selectedSquare.y}}</h3>
+        <a href="#">{{selectedUnits[0].owner.name || 'Unowned'}}</a><br>
+        <a href="#" ng-click="detail.selection = 'Square'">{{selectedSquare.terrain.name}} ({{state.getMunicipalityAt(selectedSquare.x, selectedSquare.y).owner.name || 'Unowned'}})</a>
+      </div>
+	    <img ng-switch-when="Square" src="images/{{selectedSquare.terrain.image}}" class="icon">
+      <div ng-switch-when="Square" class="info">
+        <h3>{{selectedSquare.terrain.name}} @ {{selectedSquare.x}}, {{selectedSquare.y}}</h3>
+        <a href="#">{{state.getMunicipalityAt(selectedSquare.x, selectedSquare.y).owner.name || 'Unowned'}}</a>
       </div>
     </div>
   </div>

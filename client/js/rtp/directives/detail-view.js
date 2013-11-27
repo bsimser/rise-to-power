@@ -14,6 +14,8 @@
 
 define(function(require) {
 	var rtp = require('rtp/ui-module');
+  var Square = require('rtp/square');
+  
   rtp.directive('detailView', function() {
     return {
       scope: false,
@@ -27,31 +29,22 @@ define(function(require) {
   var DetailViewController = function($scope, $element) {
     console.log('detail-view controller');
     
-    // Returns the type of the given object as a string.
-    // TODO(applmak): There are elegant ways of doing this. Use one of them.
-    $scope.getType = function(selectedThing) {
-      if (selectedThing) {
-        return "Square";
+    $scope.$watch('selected', function(selected) {
+      if (selected) {
+        $scope.selectedUnits = $scope.state.getUnitsAt(selected.x, selected.y);
+        $scope.selectedSquare = selected;
+        
+        if ($scope.selectedUnits.length) {
+          $scope.detail.selection = 'Units';
+        } else {
+          $scope.detail.selection = 'Square';
+        }
+      } else {
+        $scope.selectedUnits = [];
+        $scope.selectedSquare = undefined;
+        $scope.detail.selection = 'Nothing';
       }
-      return "undefined";
-    };
-    
-    // Returns the owner of a thing or undefined if there is no owner.
-    // @return {Player} the owning player.
-    $scope.getOwner = function(selectedThing) {
-      if (selectedThing) {
-        var m = $scope.state.getMunicipalityAt(selectedThing.x, selectedThing.y);
-        return m.owner;
-      }
-    };
-    
-    // Returns an image to display for the selected thing.
-    $scope.getImage = function(selectedThing) {
-      if (selectedThing) {
-        // Square!
-        return 'images/' + selectedThing.terrain.image;
-      }
-    };
+    });
   };
   
   rtp.controller('DetailViewController', DetailViewController);
