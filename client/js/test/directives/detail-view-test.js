@@ -70,6 +70,16 @@ define(function(require) {
       expect(info.text()).to.contain('1 Unit');
     });
     
+    it('displays the currently selected building', function() {
+      scope.$apply(function() {
+        var building = scope.state.buildings[0];
+        scope.selected = scope.state.getSquareAt(building.location.x, building.location.y);
+      });
+      
+      var info = $(element).find('.info');
+      expect(info.text()).to.contain('Farm');
+    });
+    
     it('displays the image associated with the selection', function() {
       scope.$apply(function() {
         scope.selected = scope.state.getSquareAt(5, 17);

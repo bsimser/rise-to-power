@@ -11,6 +11,12 @@
         <a href="#">{{selectedUnits[0].owner.name || 'Unowned'}}</a><br>
         <a href="#" ng-click="detail.selection = 'Square'">{{selectedSquare.terrain.name}} ({{state.getMunicipalityAt(selectedSquare.x, selectedSquare.y).owner.name || 'Unowned'}})</a>
       </div>
+	    <img ng-switch-when="Building" src="images/{{selectedBuilding.type.image}}" class="icon">
+      <div ng-switch-when="Building" class="info">
+        <h3>{{selectedBuilding.type.name}} @ {{selectedSquare.x}}, {{selectedSquare.y}}</h3>
+        <a href="#">{{state.getMunicipalityAt(selectedSquare.x, selectedSquare.y).owner.name || 'Unowned'}}</a><br>
+        <a href="#" ng-click="detail.selection = 'Square'">{{selectedSquare.terrain.name}} ({{state.getMunicipalityAt(selectedSquare.x, selectedSquare.y).owner.name || 'Unowned'}})</a>
+      </div>
 	    <img ng-switch-when="Square" src="images/{{selectedSquare.terrain.image}}" class="icon">
       <div ng-switch-when="Square" class="info">
         <h3>{{selectedSquare.terrain.name}} @ {{selectedSquare.x}}, {{selectedSquare.y}}</h3>

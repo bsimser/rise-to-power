@@ -32,15 +32,19 @@ define(function(require) {
     $scope.$watch('selected', function(selected) {
       if (selected) {
         $scope.selectedUnits = $scope.state.getUnitsAt(selected.x, selected.y);
+        $scope.selectedBuilding = $scope.state.getBuildingAt(selected.x, selected.y);
         $scope.selectedSquare = selected;
         
         if ($scope.selectedUnits.length) {
           $scope.detail.selection = 'Units';
+        } else if ($scope.selectedBuilding) {
+          $scope.detail.selection = 'Building';
         } else {
           $scope.detail.selection = 'Square';
         }
       } else {
         $scope.selectedUnits = [];
+        $scope.selectedBuilding = undefined;
         $scope.selectedSquare = undefined;
         $scope.detail.selection = 'Nothing';
       }

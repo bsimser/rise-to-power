@@ -282,6 +282,14 @@ define(function(require) {
         }
       }
     }
+    
+    // Draw buildings
+    var building = this.scope.state.getBuildingAt(square.x, square.y);
+    if (building) {
+      var image = this.images.get(building.type.image);
+      this.context.drawImage(image, offset.x - this.translation.x,
+                                    offset.y - this.translation.y);
+    }
   };
   // Returns a list of visible square coordinates in [x1, y1, x2, y2, ...] form.
   // @returns Array of numbers.

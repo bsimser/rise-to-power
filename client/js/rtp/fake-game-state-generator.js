@@ -19,6 +19,7 @@ define(function(require) {
   var Municipality = require('rtp/municipality');
   var Player = require('rtp/player');
   var Unit = require('rtp/unit');
+  var Building = require('rtp/building');
   var testRules = require('rtp/test-rules');
   
   function fade(t) {
@@ -146,9 +147,16 @@ define(function(require) {
       return new Unit('fjsl', 'dude', player.name, x + ',' + y, 10, null);
     });
     
-    var fakeBuildings = [];
-    // TODO(applmak): Make some fake buildings!
-    
+    var fakeBuildings = fakePlayers.map(function(player) {
+      // make a building for each player...
+      var m = player.ownedLand[0].split(',');
+      var x = Math.floor(Math.random() * 17) + parseInt(m[0]);
+      var y = Math.floor(Math.random() * 17) + parseInt(m[1]);
+      
+      console.log(player.name, 'building', x, y);
+      
+      return new Building('flkjs', 'farm', x + ',' + y, [], []);
+    });
     console.log('Generated fake game state!');
     
     function FakeGameState() {

@@ -20,7 +20,7 @@ define(function(require) {
     resourceBlueprints: [{id: 'iron', name: 'Iron', image: 'iron.png'},
                          {id: 'lumber', name: 'Lumber', image: 'lumber.png'},
                          {id: 'coal', name: 'Coal', image: 'coal.png'}],
-    buildingBlueprints: [{id: 'farm', name: 'Farm', image: 'farm.png', production: null,
+    buildingBlueprints: [{id: 'farm', name: 'Farm', image: 'buildings/farm.png', production: null,
                           constructionCost: [{quantity: 17, blueprint: 'iron'},
                                              {quantity: 5, blueprint: 'lumber'}]}]
   });
