@@ -16,13 +16,14 @@ define(function(require) {
   var Order = require('rtp/order');
   
   var MovementOrder = function(id, unit, destination, path) {
-    Order.call(this, id, 'Move Units', 'MovementOrder');
+    Order.call(this, id, 'Move Units', MovementOrder.id);
     this.unit = unit;
     this.destination = destination;
     this.path = path;
   };
+  MovementOrder.id = 'MovementOrder';
   MovementOrder.prototype = Object.create(Order.prototype);
-  Order.registerSubtype('MovementOrder', MovementOrder);
+  Order.registerSubtype(MovementOrder);
   
   MovementOrder.deserialize = function(mo) {
     return new MovementOrder(mo.id, mo.unit, mo.destination, mo.path);

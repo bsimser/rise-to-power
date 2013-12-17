@@ -22,8 +22,8 @@ define(function() {
   // A map of type string -> order subclasses.
   Order.orderTypes = {};
   
-  Order.registerSubtype = function(type, constructor) {
-    Order.orderTypes[type] = constructor;
+  Order.registerSubtype = function(constructor) {
+    Order.orderTypes[constructor.id] = constructor;
   };
   
   // Deserializes a JSON object into a semi-loaded Order instance.

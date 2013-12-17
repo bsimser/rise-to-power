@@ -24,16 +24,16 @@ define(function(require) {
       console.log('backend address:', result.data);
       // TODO(applmak): When backend starts talkin' websockets, create the 
       // jsonrpc client here, and stick it somewhere.
+      
+      // TODO(applmak): Once the server supports it, here's a good place to read
+      // the entire game state. For the moment, we'll fake it.
+      var state = FakeGameStateGenerator('rtp-debug');
+      $timeout(function() {
+        $scope.state = state;
+      }, 2000);
     }, function(error) {
       console.error('backend error:', error);
       $location.path('/login');
     });
-    
-    // TODO(applmak): Once the server supports it, here's a good place to read
-    // the entire game state. For the moment, we'll fake it.
-    var state = FakeGameStateGenerator();
-    $timeout(function() {
-      $scope.state = state;
-    }, 2000);
   });
 });

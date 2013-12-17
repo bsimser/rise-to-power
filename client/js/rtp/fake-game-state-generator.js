@@ -20,6 +20,7 @@ define(function(require) {
   var Player = require('rtp/player');
   var Unit = require('rtp/unit');
   var Building = require('rtp/building');
+  var MovementOrder = require('rtp/movement-order');
   var testRules = require('rtp/test-rules');
   
   function fade(t) {
@@ -101,7 +102,14 @@ define(function(require) {
     }
   }
   
-  return function() {
+  var prevRand = 0.001;
+  function nextRand() {
+    prevRand = noise(prevRand * 10000 + 0.01, prevRand * 2457 + 0.01, 0);
+    var r = (prevRand + 1.0) * 0.5;
+    return r;
+  }
+  
+  return function(loggedInPlayer) {
     var fakeSquares = [];
     for (var j = -17*6; j < 17*6; ++j) {
       for (var i = -17*6; i < 17*6; ++i) {
@@ -119,7 +127,7 @@ define(function(require) {
       }
     }
     
-    var fakePlayers = ['applmak', 'jmegq', 'jwall', 'swsnider', 'dovenj'].map(function(name) {
+    var fakePlayers = [loggedInPlayer, 'applmak', 'jmegq', 'jwall', 'swsnider', 'dovenj'].map(function(name) {
       return new Player(name, name, [], [], [], null, null, [], []);
     });
     
@@ -136,22 +144,27 @@ define(function(require) {
       p.ownedLand.push(fakeMunicipalities[i].x + ',' + fakeMunicipalities[i].y);
     });
     
-    var fakeUnits = fakePlayers.map(function(player) {
+    var someUnit;
+    var fakeUnits = fakePlayers.map(function(player, index) {
       // make a unit for each player... on a random square in his municipality.
       var m = player.ownedLand[0].split(',');
-      var x = Math.floor(Math.random() * 17) + parseInt(m[0]);
-      var y = Math.floor(Math.random() * 17) + parseInt(m[1]);
+      var x = Math.floor(nextRand() * 17) + parseInt(m[0]);
+      var y = Math.floor(nextRand() * 17) + parseInt(m[1]);
       
       console.log(player.name, 'dude', x, y);
       
-      return new Unit('fjsl', 'dude', player.name, x + ',' + y, 10, null);
+      var u = new Unit('fjsl' + index, 'dude', player.name, x + ',' + y, 10, null);
+      if (player.name == 'rtp-debug') {
+        someUnit = u;
+      }
+      return u;
     });
     
     var fakeBuildings = fakePlayers.map(function(player) {
       // make a building for each player...
       var m = player.ownedLand[0].split(',');
-      var x = Math.floor(Math.random() * 17) + parseInt(m[0]);
-      var y = Math.floor(Math.random() * 17) + parseInt(m[1]);
+      var x = Math.floor(nextRand() * 17) + parseInt(m[0]);
+      var y = Math.floor(nextRand() * 17) + parseInt(m[1]);
       
       console.log(player.name, 'building', x, y);
       
@@ -159,7 +172,11 @@ define(function(require) {
     });
     
     var fakeOrders = [];
-    // TODO(applmak): Fill in the fake orders here...
+    // We're going to fill in fake orders for the logged-in-user, which is 
+    // hard-coded to be rtp-debug in other parts of the code. In the future,
+    // when we actually transfer the logged-in-user, we won't need this, but 
+    // then, hopefully, we won't need a fake game state generator.
+    fakeOrders.push(new MovementOrder('mo', someUnit.id, someUnit.location, []));
     
     console.log('Generated fake game state!');
     

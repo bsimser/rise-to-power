@@ -29,24 +29,24 @@ define(function(require) {
   var DetailViewController = function($scope, $element) {
     console.log('detail-view controller');
     
-    $scope.$watch('selected', function(selected) {
+    $scope.$watch('selected.object', function(selected) {
       if (selected) {
-        $scope.selectedUnits = $scope.state.getUnitsAt(selected.x, selected.y);
-        $scope.selectedBuilding = $scope.state.getBuildingAt(selected.x, selected.y);
-        $scope.selectedSquare = selected;
+        $scope.selected.units = $scope.state.getUnitsAt(selected.x, selected.y);
+        $scope.selected.building = $scope.state.getBuildingAt(selected.x, selected.y);
+        $scope.selected.square = selected;
         
-        if ($scope.selectedUnits.length) {
-          $scope.detail.selection = 'Units';
-        } else if ($scope.selectedBuilding) {
-          $scope.detail.selection = 'Building';
+        if ($scope.selected.units.length) {
+          $scope.selected.type = 'Units';
+        } else if ($scope.selected.building) {
+          $scope.selected.type = 'Building';
         } else {
-          $scope.detail.selection = 'Square';
+          $scope.selected.type = 'Square';
         }
       } else {
-        $scope.selectedUnits = [];
-        $scope.selectedBuilding = undefined;
-        $scope.selectedSquare = undefined;
-        $scope.detail.selection = 'Nothing';
+        $scope.selected.units = [];
+        $scope.selected.buildings = undefined;
+        $scope.selected.square = undefined;
+        $scope.selected.type = 'Nothing';
       }
     });
   };

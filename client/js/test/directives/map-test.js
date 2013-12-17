@@ -28,8 +28,8 @@ define(function(require) {
     beforeEach(module('rtp'));
     beforeEach(inject(function($compile, $rootScope) {
       scope = $rootScope;
-      scope.state = FakeGameStateGenerator();
-      var link = $compile('<map style="width: 100px; height: 400px" hover="hover" out-selected="selected" state="state" in-center-on="center"></map>');
+      scope.state = FakeGameStateGenerator('rtp-debug');
+      var link = $compile('<map style="width: 100px; height: 400px" hover="hover" selected="selected" state="state"></map>');
       element = link($rootScope);
       canvasHack = sinon.stub(CanvasRenderingContext2D.prototype, 'drawImage');
     }));
@@ -54,7 +54,7 @@ define(function(require) {
     });
     
     it('watches changes to the center and adjusts the selection', function() {
-      scope.center = {x: 10, y: 10};
+      scope.selected = {x: 10, y: 10};
       scope.$digest();
       expect(scope.selected).to.be.defined;
       expect(scope.selected.x).to.equal(10);
@@ -62,7 +62,7 @@ define(function(require) {
     });
     
     it('when the center is right out, selection is null', function() {
-      scope.center = {x: 10000, y: 10000};
+      scope.selected = {x: 10000, y: 10000};
       scope.$digest();
       expect(scope.selected).to.be.undefined;
     });

@@ -27,8 +27,8 @@ define(function(require) {
   describe('Order', function() {
     describe('deserialize', function() {
       it('calls deserialize on the registered constructor', function() {
-        var subtype = {deserialize: sinon.spy()};
-        Order.registerSubtype('subtype', subtype);
+        var subtype = {id: 'subtype', deserialize: sinon.spy()};
+        Order.registerSubtype(subtype);
         Order.deserialize({type: 'subtype'});
         expect(subtype.deserialize).to.be.calledOnce;
       });

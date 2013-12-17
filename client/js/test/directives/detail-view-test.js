@@ -32,7 +32,7 @@ define(function(require) {
     beforeEach(module('partials/detail-view.html'));
     beforeEach(inject(function($compile, $rootScope) {
       scope = $rootScope;
-      scope.state = FakeGameStateGenerator();
+      scope.state = FakeGameStateGenerator('rtp-debug');
       element = $compile('<detail-view></detail-view>')($rootScope);
       scope.$digest();
     }));
@@ -40,7 +40,7 @@ define(function(require) {
     it('displays the x,y of the selection', function() {
       scope.$apply(function() {
         scope.state.setSquareProperties(31, 42, {terrain: Terrain.FIELD});
-        scope.selected = scope.state.getSquareAt(31, 42);
+        scope.selected.object = scope.state.getSquareAt(31, 42);
       });
 
       var info = $(element).find('.info');
@@ -52,7 +52,7 @@ define(function(require) {
     
     it('displays the owner of the selection', function() {
       scope.$apply(function() {
-        scope.selected = scope.state.getSquareAt(5, 17);
+        scope.selected.object = scope.state.getSquareAt(5, 17);
         scope.state.setMunicipalityProperties(5, 17, {owner: 'applmak'});
       });
       
@@ -63,7 +63,7 @@ define(function(require) {
     it('displays the currently selected unit', function() {
       scope.$apply(function() {
         var unit = scope.state.units[0];
-        scope.selected = scope.state.getSquareAt(unit.location.x, unit.location.y);
+        scope.selected.object = scope.state.getSquareAt(unit.location.x, unit.location.y);
       });
       
       var info = $(element).find('.info');
@@ -73,7 +73,7 @@ define(function(require) {
     it('displays the currently selected building', function() {
       scope.$apply(function() {
         var building = scope.state.buildings[0];
-        scope.selected = scope.state.getSquareAt(building.location.x, building.location.y);
+        scope.selected.object = scope.state.getSquareAt(building.location.x, building.location.y);
       });
       
       var info = $(element).find('.info');
@@ -82,7 +82,7 @@ define(function(require) {
     
     it('displays the image associated with the selection', function() {
       scope.$apply(function() {
-        scope.selected = scope.state.getSquareAt(5, 17);
+        scope.selected.object = scope.state.getSquareAt(5, 17);
       });
       
       var info = $(element).find('img.icon');

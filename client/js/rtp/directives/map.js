@@ -28,8 +28,7 @@ define(function(require) {
       scope: {
         state: '=',
         hoverSquare: '=hover',
-        selected: '=outSelected',
-        requestedCenter: '=inCenterOn'
+        selected: '=',
       },
       restrict: 'E',
       replace: true,
@@ -80,7 +79,7 @@ define(function(require) {
                                             $scope.hoverSquare);
       });
     });
-    this.scope.$watch('requestedCenter', function(center) {
+    this.scope.$watch('selected', function(center) {
       if (center) {
         // check to see if this square is near enough the middle of the map.
         var location = CoordinateTransformer.mapToPixel(center.x, center.y, new Point);
