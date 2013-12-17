@@ -157,6 +157,10 @@ define(function(require) {
       
       return new Building('flkjs', 'farm', x + ',' + y, [], []);
     });
+    
+    var fakeOrders = [];
+    // TODO(applmak): Fill in the fake orders here...
+    
     console.log('Generated fake game state!');
     
     function FakeGameState() {
@@ -206,7 +210,7 @@ define(function(require) {
       }
     };
     
-    var state = new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers, fakeUnits, fakeBuildings);
+    var state = new FakeGameState(fakeSquares, fakeMunicipalities, fakePlayers, fakeUnits, fakeBuildings, fakeOrders);
     state.finishDeserialize(null, testRules);
     return state;
   };

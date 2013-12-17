@@ -44,7 +44,7 @@ define(function(require) {
       });
       
       it('resolves keys on finishDeserialize', function() {
-        var state = new GameState([new Square('0,0', null, 0, 0)], [], [], [], []);
+        var state = new GameState([new Square('0,0', null, 0, 0)], [], [], [], [], []);
         building.finishDeserialize(state, testRules);
         
         expect(building.type).to.be.an.instanceof(BuildingBlueprint);

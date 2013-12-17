@@ -41,7 +41,7 @@ define(function(require) {
         });
         var state = new GameState([], [], [
           new Player('id', 'matt')
-        ], [], []);
+        ], [], [], []);
         m.finishDeserialize(state);
         expect(m.owner).to.be.an.instanceof(Player);
         expect(m.owner.name).to.equal('matt');

@@ -19,43 +19,39 @@ define(function(require) {
   
   var expect = chai.expect;
   var sinon = require('test/sinon');
-  var testRules = require('rtp/test-rules');
   var GameState = require('rtp/game-state');
   var Unit = require('rtp/unit');
-  var Player = require('rtp/player');
   var Square = require('rtp/square');
-  var UnitBlueprint = require('rtp/unit-blueprint');
+  var MovementOrder = require('rtp/movement-order');
   
-  describe('Unit', function() {
+  describe('MovementOrder', function() {
     describe('deserialize', function() {
-      var unit;
+      var movementOrder;
       beforeEach(function() {
-        unit = Unit.deserialize({
-          id: '1', type: 'dude', owner: 'matt', location: '1,4', power: 5, group: 'group1'
+        movementOrder = MovementOrder.deserialize({
+          id: 'mo', unit: 'dude', destination: '1,2', path: ['1,3', '1,2']
         });
       });
       
       it('doesn\'t resolve anything initially', function() {
-        expect(unit).to.be.an.instanceof(Unit);
-        expect(unit.owner).to.equal('matt');
-        expect(unit.location).to.equal('1,4');
-        expect(unit.type).to.equal('dude');
+        expect(movementOrder).to.be.an.instanceof(MovementOrder);
+        expect(movementOrder.unit).to.equal('dude');
+        expect(movementOrder.destination).to.equal('1,2');
+        expect(movementOrder.path[0]).to.equal('1,3');
       });
       
-      it('resolves key on finishDeserialize', function() {
+      it('resolves keys on finishDeserialize', function() {
         var state = new GameState(
-          [new Square('', '', 1, 4)],
-          [],
-          [new Player('matt', 'matt')],
-          [], [], []);
-        unit.finishDeserialize(state, testRules);
-        expect(unit).to.be.an.instanceof(Unit);
-        expect(unit.owner).to.be.an.instanceof(Player);
-        expect(unit.owner.name).to.equal('matt');
-        expect(unit.location).to.be.an.instanceof(Square);
-        expect(unit.location.x).to.equal(1);
-        expect(unit.type).to.be.an.instanceof(UnitBlueprint);
-        expect(unit.type.id).to.equal('dude');
+          [new Square('1,2', null, 1, 2), new Square('1,3', null, 1, 3)], [],
+          [], [new Unit('dude', 'dude')], [], []);
+        movementOrder.finishDeserialize(state);
+        
+        expect(movementOrder.unit).to.be.an.instanceof(Unit);
+        expect(movementOrder.unit.id).to.equal('dude');
+        expect(movementOrder.destination).to.be.an.instanceof(Square);
+        expect(movementOrder.destination.id).to.equal('1,2');
+        expect(movementOrder.path[0]).to.be.an.instanceof(Square);
+        expect(movementOrder.path[0].id).to.equal('1,3');
       });
     });
   });

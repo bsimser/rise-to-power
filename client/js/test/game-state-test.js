@@ -29,6 +29,7 @@ define(function(require) {
   var ResourceQuantity = require('rtp/resource-quantity');
   var Building = require('rtp/building');
   var BuildingBlueprint = require('rtp/building-blueprint');
+  var MovementOrder = require('rtp/movement-order');
   var testRules = require('rtp/test-rules');
   
   describe('GameState', function() {
@@ -40,7 +41,8 @@ define(function(require) {
                               [new Municipality('0,0', 0, 0)],
                               [new Player('joe', 'joe')],
                               [new Unit('dude', 'dude', 'joe', '1,4')],
-                              [new Building('myfarm', 'farm', '1,3', [], [new ResourceQuantity(100, 'lumber')])]);
+                              [new Building('myfarm', 'farm', '1,3', [], [new ResourceQuantity(100, 'lumber')])],
+                              [new MovementOrder('someorder', 'dude', '1,3', ['1,3'])]);
       });
       it('can return a square by key', function() {
         var square = state.getSquareByKey('1,3');
@@ -83,10 +85,20 @@ define(function(require) {
         expect(units.length).to.equal(1);
         expect(units[0].id).to.equal('dude');
       });
+      it('can return a unit by id', function() {
+        var unit = state.getUnitById('dude');
+        expect(unit).to.be.an.instanceof(Unit);
+        expect(unit.id).to.equal('dude');
+      });
       it('can return buildings by location', function() {
         var building = state.getBuildingAt(1, 3);
         expect(building).to.be.an.instanceof(Building);
         expect(building.type).to.equal('farm');
+      });
+      it('can return orders by id', function() {
+        var order = state.getOrderById('someorder');
+        expect(order).to.be.an.instanceof(MovementOrder);
+        expect(order.id).to.equal('someorder');
       });
     });
     
@@ -101,6 +113,7 @@ define(function(require) {
           units: [{id: 'dude1', type: 'dude', owner: 'jwall', location: '0,0', power: 10, group: null}],
           buildings: [{id: 'myfarm', type: 'farm', location: '0,0', productionLevels: null,
                        storage: [{quantity: 100, blueprint: 'lumber'}]}],
+          orders: [{id: 'someorder', type:'MovementOrder', unit: 'dude1', destination: '0,0', path: ['0,0']}],
         });
       });
       it('doesn\'t resolve anything yet', function() {
@@ -113,6 +126,8 @@ define(function(require) {
         expect(state.units[0].owner).to.equal('jwall');
         expect(state.buildings[0]).to.be.an.instanceof(Building);
         expect(state.buildings[0].type).to.equal('farm');
+        expect(state.orders[0]).to.be.an.instanceof(MovementOrder);
+        expect(state.orders[0].unit).to.equal('dude1');
       });
       it('resolves everything', function() {
         state.finishDeserialize(null, testRules);
@@ -126,6 +141,7 @@ define(function(require) {
         expect(state.units[0].type.name).to.equal('Dude');
         expect(state.buildings[0].type).to.be.an.instanceof(BuildingBlueprint);
         expect(state.buildings[0].type.id).to.equal('farm');
+        expect(state.orders[0].unit).to.be.an.instanceof(Unit);
       });
     });
   });

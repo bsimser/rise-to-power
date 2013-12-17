@@ -18,6 +18,10 @@ define(function(require) {
   var Player = require('rtp/player');
   var Unit = require('rtp/unit');
   var Building = require('rtp/building');
+  var Order = require('rtp/order');
+  // Because of the way that Orders work, we need to include the subclasses 
+  // somewhere.... here is fine.
+  var MovementOrder = require('rtp/movement-order');
   
   var OFFSETS = {
     'u': {x: -1, y: 1},
@@ -30,12 +34,13 @@ define(function(require) {
     'ul': {x: -1, y: 0},
   };
   
-  var GameState = function(squares, municipalities, players, units, buildings) {
+  var GameState = function(squares, municipalities, players, units, buildings, orders) {
     this.squares = squares;
     this.municipalities = municipalities;
     this.players = players;
     this.units = units;
     this.buildings = buildings;
+    this.orders = orders;
     
     // build a handy-dandy map of x,y location to square to save time.
     this.squaresByLocation = {};
@@ -52,18 +57,27 @@ define(function(require) {
     this.players.forEach(function(p) {
       this.playersByName[p.name] = p;
     }, this);
+    // build a map of id -> unit
+    this.unitsById = {};
     // build a multimap of location -> unit.
     this.unitsByLocation = {};
     this.units.forEach(function(u) {
       // Note that these units are half-deserialized units, with no points to
       // other data objects.
       (this.unitsByLocation[u.location] = this.unitsByLocation[u.location] || []).push(u);
+      this.unitsById[u.id] = u;
     }, this);
     
     // build a map of location -> building.
     this.buildingsByLocation = {};
     this.buildings.forEach(function(b) {
       this.buildingsByLocation[b.location] = b;
+    }, this);
+    
+    // build a map of id -> order.
+    this.ordersById = {};
+    this.orders.forEach(function(o) {
+      this.ordersById[o.id] = o;
     }, this);
   };
   GameState.prototype.getSquareByKey = function(key) {
@@ -91,11 +105,17 @@ define(function(require) {
   GameState.prototype.getPlayerByName = function(name) {
     return this.playersByName[name];
   };
+  GameState.prototype.getUnitById = function(id) {
+    return this.unitsById[id];
+  };
   GameState.prototype.getUnitsAt = function(x, y) {
     return this.unitsByLocation[x + ',' + y] || [];
   };
   GameState.prototype.getBuildingAt = function(x, y) {
     return this.buildingsByLocation[x + ',' + y];
+  };
+  GameState.prototype.getOrderById = function(id) {
+    return this.ordersById[id];
   };
   
   // Deserializes an entire game state into a GameState instance.
@@ -105,7 +125,8 @@ define(function(require) {
       s.municipalities.map(Municipality.deserialize),
       s.players.map(Player.deserialize),
       s.units.map(Unit.deserialize),
-      s.buildings.map(Building.deserialize)
+      s.buildings.map(Building.deserialize),
+      s.orders.map(Order.deserialize)
     );
   };
   
@@ -126,6 +147,9 @@ define(function(require) {
     }, this);
     this.buildings.forEach(function(b) {
       b.finishDeserialize(this, rules);
+    }, this);
+    this.orders.forEach(function(o) {
+      o.finishDeserialize(this, rules);
     }, this);
   };
   

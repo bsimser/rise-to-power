@@ -47,7 +47,7 @@ define(function(require) {
           new Player('swsnider', 'swsnider'),
           new Player('george', 'george'),
           new Player('dude', 'dude'),
-        ], [], []);
+        ], [], [], []);
         player.finishDeserialize(state);
         
         expect(player.liege).to.be.null;
