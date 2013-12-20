@@ -8,3 +8,4 @@ frontend/frontend
 .etcd
 .node*
 .logs
+*npm-debug.log
