@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// package world defines the structs used for constructing a world map.
-package world
+// package state defines the structs used for the game state.
+package state
 
 import "sync"
 
