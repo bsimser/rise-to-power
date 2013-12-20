@@ -119,6 +119,7 @@ type Codec interface {
 type jsonCodec struct{}
 
 func (c jsonCodec) Serialize(w http.ResponseWriter, i interface{}) error {
+	w.Header().Add("Content-Type", "aplication/json")
 	e := json.NewEncoder(w)
 	return e.Encode(i)
 }
