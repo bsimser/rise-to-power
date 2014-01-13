@@ -34,12 +34,12 @@ func NewEtcdStore(etcdAddr string) Store {
 }
 
 func (s *etcdSessionStore) Get(name string) (*Session, error) {
-	resp, err := s.client.Get(fmt.Sprintf(etcdFormatStr, name), false)
+	resp, err := s.client.Get(fmt.Sprintf(etcdFormatStr, name), false, false)
 	if err != nil {
 		return nil, err
 	}
 	session := new(Session)
-	err = json.Unmarshal([]byte(resp.Value), session)
+	err = json.Unmarshal([]byte(resp.Node.Value), session)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +65,6 @@ func (s *etcdSessionStore) StartSession(name string) (*Session, error) {
 }
 
 func (s *etcdSessionStore) EndSession(name string) error {
-	_, err := s.client.Delete(name)
+	_, err := s.client.Delete(name, false)
 	return err
 }
