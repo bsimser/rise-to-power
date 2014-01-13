@@ -14,9 +14,9 @@
 
 package state
 
-import "testing"
+//import "testing"
 
-var worldSquares = []*Square{
+/*var worldSquares = []*Square{
 	{Base: Base{Id: "square1"}, X: 1, Y: 1},
 	{Base: Base{Id: "square2"}, X: 1, Y: 2},
 	{Base: Base{Id: "square3"}, X: 1, Y: 3},
@@ -107,3 +107,4 @@ func TestBasicSquareStorage(t *testing.T) {
 		t.Errorf("Error getting rectangle %s", err)
 	}
 }
+*/

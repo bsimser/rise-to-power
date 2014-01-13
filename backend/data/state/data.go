@@ -17,12 +17,6 @@ package state
 
 import "sync"
 
-var (
-	Fields = Terrain{Name: "Fields"}
-	Forest = Terrain{Name: "Forest"}
-	Sea    = Terrain{Name: "Sea"}
-)
-
 const (
 	MunicipalitySize = 5
 )
@@ -48,29 +42,6 @@ type Building struct {
 type Resource struct {
 	Base
 	// TODO(jwall):
-}
-
-// Terrain defines the type of Terrain on a square of the map.
-type Terrain struct {
-	Name string
-	// TODO(jwall):
-}
-
-// Square defines a single square on a map.
-type Square struct {
-	Base
-
-	// The Terrain on this square.
-	Terrain Terrain
-
-	// x,y coordinate of this square.
-	X, Y int
-
-	// A building on this square. nil if no building is on this square.
-	Building *Building
-
-	// The resource on this square. nil if no resource is on this square.
-	Resource *Resource
 }
 
 type Municipality struct {
