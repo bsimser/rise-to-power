@@ -20,7 +20,7 @@ import (
 )
 
 func TestSquareSerialize(t *testing.T) {
-	square := Square{ID: "5,6", Terrain: Fields, X: 5, Y: 6}
+	square := Square{ID: "5,6", Terrain: terrainMap["."], X: 5, Y: 6}
 	output, _ := square.MarshalJSON()
 
 	var thing Square

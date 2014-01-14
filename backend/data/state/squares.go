@@ -17,12 +17,23 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/swsnider/glog"
 )
 
 var (
-	Fields = Terrain{ID: ".", Name: "Fields"}
-	Forest = Terrain{ID: "T", Name: "Forest"}
-	Sea    = Terrain{ID: "~", Name: "Sea"}
+	// TODO(jwall): At some point these ID's should be something less
+	// arcane.
+	terrainMap = map[string]*Terrain{
+		".": {ID: ".", Name: "Fields"},
+		"T": {ID: "T", Name: "Forest"},
+		"~": {ID: "~", Name: "Sea"},
+	}
+
+	Fields = terrainMap["."]
+	Forest = terrainMap["T"]
+	Sea    = terrainMap["~"]
 )
 
 // Terrain defines the type of Terrain on a square of the map.
@@ -39,7 +50,7 @@ type Square struct {
 	ID string
 
 	// The Terrain on this square.
-	Terrain Terrain
+	Terrain *Terrain
 
 	// x,y coordinate of this square.
 	X, Y int
@@ -51,25 +62,32 @@ type Square struct {
 	// Resource *Resource
 }
 
+type halfDeserializedSquare struct {
+	ID      string `json:"id"`
+	Terrain string `json:"terrain"`
+	X       int    `json:"x"`
+	Y       int    `json:"y"`
+}
+
 func (s Square) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"id": s.ID, "terrain": s.Terrain.ID, "x": s.X, "Y": s.Y})
+	return json.Marshal(&halfDeserializedSquare{ID: s.ID, Terrain: s.Terrain.ID, X: s.X, Y: s.Y})
 }
 
 func (s *Square) UnmarshalJSON(data []byte) error {
-	type HalfDeserializedSquare struct {
-		ID      string
-		Terrain string
-		X, Y    int
-	}
-
-	var blob HalfDeserializedSquare
+	var blob halfDeserializedSquare
 	if error := json.Unmarshal(data, &blob); error != nil {
 		return error
 	}
 
 	s.ID = blob.ID
-	// TODO(jwall): Make a global constant map of ID -> Terrain type, and use it here to prevent looking at every terrain instance.
-	s.Terrain = Fields
+	var ok bool
+	if s.Terrain, ok = terrainMap[blob.Terrain]; !ok {
+		if glog.V(1) {
+			glog.Errorf("Unknown Terrain %q. Using zero value %v",
+				blob.Terrain, s.Terrain)
+		}
+		return fmt.Errorf("Unknown Terrain %q.", blob.Terrain)
+	}
 	s.X = blob.X
 	s.Y = blob.Y
 
