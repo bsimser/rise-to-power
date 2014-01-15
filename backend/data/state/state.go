@@ -15,6 +15,8 @@
 // package state defines the structs used for the game state.
 package state
 
+// State is a collection of all of the game state that we need to simulate the
+// game. Note that this does not include the Rules, which is a different struct.
 type State struct {
 	// The list of squares available to the client.
 	squares []Square
