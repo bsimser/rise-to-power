@@ -16,19 +16,19 @@ package state
 
 import (
 	"encoding/json"
-  "reflect"
+	"reflect"
 	"testing"
 )
 
 func TestStateSerialize(t *testing.T) {
-	var state = State{squares: []Square(Square{ID: "1,2", Terrain: Fields, X: 1, Y: 2})}
+	var state = State{Squares: []Square{{ID: "1,2", Terrain: Fields, X: 1, Y: 2}}}
 	var output, _ = json.Marshal(state)
 
 	var newState State
 	if error := json.Unmarshal(output, &newState); error != nil {
 		panic(error)
 	}
-  if !reflect.DeepEqual(state, newState) {
+	if !reflect.DeepEqual(state, newState) {
 		t.Errorf("Serialized state %v doesn't match original state %v", newState, state)
 	}
 }

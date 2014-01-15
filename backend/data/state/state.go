@@ -19,5 +19,7 @@ package state
 // game. Note that this does not include the Rules, which is a different struct.
 type State struct {
 	// The list of squares available to the client.
-	squares []Square
+	Squares []Square `json:"squares"`
+
+	// Other slices go here.
 }
