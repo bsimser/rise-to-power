@@ -12,5 +12,5 @@ if [ ! -f ".etcd/etcd" ]; then
   popd
 fi
 go get ./...
-.etcd/etcd -d .node0 -n node0&
+.etcd/bin/etcd --data-dir .node0 --name node0&
 ../../../../bin/frontend --use_etcd --log_dir=".logs" --flush_interval=1s
